@@ -1,12 +1,17 @@
 from django.shortcuts import render
 from .models import Animal, Habitat
 from django.http import JsonResponse
+import json
 from django.db import transaction
+from django.views.decorators.csrf import csrf_exempt
 def all_animals(request):
     animals = Animal.objects.all()
     result = []
     for animal in animals:
-        result.append(f'Animal: {animal.name}, Habitat: {animal.habitat.name}')
+        result.append({
+            'name': animal.name,
+            'habitat': animal.habitat.name if animal.habitat else None
+        })
     return JsonResponse(result, safe=False)
 
 def all_habitats(request):
@@ -16,16 +21,29 @@ def all_habitats(request):
         result[habitat.name] = [animal.name for animal in habitat.animals.all()]
     return JsonResponse(result, safe=False)
 
+@csrf_exempt 
 def add_animal(request):
-    try:
-        name = request.GET.get('name')
-        habitat_id = request.GET.get('hid')
-        habitat = Habitat.objects.get(id=habitat_id)
-        with transaction.atomic():
-            new_animal = Animal.objects.create(name = name, habitat = habitat)
-    except Exception as e:
-        return(f"Something went wrong: {e}")
-    return JsonResponse(f'New animal added: ID = {new_animal.id}, Name = {new_animal.name}, Habitat = {new_animal.habitat.name}', safe=False)
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            name = data.get('name')
+            habitat_id = data.get('hid')
+
+            habitat = Habitat.objects.get(id=habitat_id)
+            with transaction.atomic():
+                new_animal = Animal.objects.create(name=name, habitat=habitat)
+
+            return JsonResponse({
+                'id': new_animal.id,
+                'name': new_animal.name,
+                'habitat': new_animal.habitat.name
+            }, status=201)
+        except Habitat.DoesNotExist:
+            return JsonResponse({'error': 'Habitat not found'}, status=404)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 def add_habitat(request):
     try:
