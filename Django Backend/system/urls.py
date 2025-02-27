@@ -1,7 +1,16 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
+from rest_framework.routers import DefaultRouter
+from .views import HabitatViewSet, AnimalViewSet
+
+
+router = DefaultRouter()
+router.register(r'habitats', HabitatViewSet)
+router.register(r'animals', AnimalViewSet)
+
 
 urlpatterns = [
+    path('api/', include(router.urls)),
     path('habitats/', views.get_habitats, name='get_habitats'),
     path('habitats/add/', views.add_habitat, name='add_habitat'),
     path('habitats/update/', views.update_habitat, name='update_habitat'),
