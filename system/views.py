@@ -9,6 +9,7 @@ def all_animals(request):
     result = []
     for animal in animals:
         result.append({
+            'id': animal.id,
             'name': animal.name,
             'habitat': animal.habitat.name if animal.habitat else None
         })
@@ -79,6 +80,9 @@ def update_animal(request):
         animal_id = request.GET.get('aid')
         animal_name = request.GET.get('name')
         habitat_id = request.GET.get('hid')
+        diet = request.GET.get('diet')
+        lifespan = request.GET.get('lifespan')
+        behavior = request.GET.get('behavior')
         with transaction.atomic():
             animal = Animal.objects.get(id = animal_id)
             if animal_name:
@@ -86,6 +90,12 @@ def update_animal(request):
             if habitat_id:
                 habitat = Habitat.objects.get(id = habitat_id)
                 animal.habitat = habitat
+            if diet:
+                animal.diet = diet
+            if lifespan:
+                animal.lifespan = lifespan
+            if behavior:
+                animal.behavior = behavior
             animal.save()
     except Exception as e:
         return(f"Something went wrong: {e}")
@@ -95,10 +105,19 @@ def update_habitat(request):
     try:
         habitat_name = request.GET.get('name')
         habitat_id = request.GET.get('hid')
+        habitat_size = request.GET.get('size')
+        habitat_climate = request.GET.get('climate')
+        habitat_species = request.GET.get('suitable_species')
         with transaction.atomic():
             habitat = Habitat.objects.get(id = habitat_id)
             if habitat_name:
                 habitat.name = habitat_name
+            if habitat_size:
+                habitat.size = habitat_size
+            if habitat_climate:
+                habitat.climate = habitat_climate
+            if habitat_species:
+                habitat.suitable_species = habitat_species
             habitat.save()
     except Exception as e:
         return(f"Something went wrong: {e}")
