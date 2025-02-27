@@ -9,6 +9,7 @@ def all_animals(request):
     result = []
     for animal in animals:
         result.append({
+            'id': animal.id,
             'name': animal.name,
             'habitat': animal.habitat.name if animal.habitat else None
         })
@@ -16,9 +17,12 @@ def all_animals(request):
 
 def all_habitats(request):
     habitats = Habitat.objects.all()
-    result = {}
+    result = []
     for habitat in habitats:
-        result[habitat.name] = [animal.name for animal in habitat.animals.all()]
+        result.append({
+            'id': habitat.id,
+            'name': habitat.name, 
+            'animals': [f'{animal.name}, ' for animal in habitat.animals.all()]})
     return JsonResponse(result, safe=False)
 
 @csrf_exempt 
@@ -54,25 +58,44 @@ def add_habitat(request):
         return(f"Something went wrong: {e}")
     return JsonResponse(f'New habitat added: ID = {new_habitat.id}, Name = {new_habitat.name}', safe=False)
 
+@csrf_exempt
 def delete_animal(request):
-    try:
-        animal_id = request.GET.get('aid')
-        with transaction.atomic():
-            animal = Animal.objects.get(id = animal_id)
-            animal.delete()
-    except Exception as e:
-        return(f"Something went wrong: {e}")
-    return JsonResponse(f'Animal with ID {animal_id} deleted', safe=False)
+    if request.method == 'DELETE':
+        try:
+            data = json.loads(request.body)
+            animal_id = data.get('aid')
 
+            with transaction.atomic():
+                animal = Animal.objects.get(id=animal_id)
+                animal.delete()
+
+            return JsonResponse({'message': f'Animal with ID {animal_id} deleted'}, status=200)
+        except Animal.DoesNotExist:
+            return JsonResponse({'error': 'Animal not found'}, status=404)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+@csrf_exempt
 def delete_habitat(request):
-    try:
-        habitat_id = request.GET.get('hid')
-        with transaction.atomic():
-            habitat = Habitat.objects.get(id = habitat_id)
-            habitat.delete()
-    except Exception as e:
-        return(f"Something went wrong: {e}")
-    return JsonResponse(f'Animal with ID {habitat_id} deleted', safe=False)
+    if request.method == 'DELETE':
+        try:
+            data = json.loads(request.body)
+            habitat_id = data.get('hid')
+
+            with transaction.atomic():
+                habitat = Habitat.objects.get(id=habitat_id)
+                habitat.delete()
+
+            return JsonResponse({'message': f'Habitat with ID {habitat_id} deleted'}, status=200)
+        except Habitat.DoesNotExist:
+            return JsonResponse({'error': 'Animal not found'}, status=404)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
+
 
 def update_animal(request):
     try:
