@@ -1,16 +1,6 @@
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
 from .models import Animal, Habitat
-from rest_framework import viewsets
-from .serializers import HabitatSerializer, AnimalSerializer
-
-class HabitatViewSet(viewsets.ModelViewSet):
-    queryset = Habitat.objects.all()
-    serializer_class = HabitatSerializer
-
-class AnimalViewSet(viewsets.ModelViewSet):
-    queryset = Animal.objects.all()
-    serializer_class = AnimalSerializer
 
 def get_habitats(request):
     habitats = Habitat.objects.all()
