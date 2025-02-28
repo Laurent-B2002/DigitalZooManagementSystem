@@ -36,7 +36,7 @@ export const HabitatList = () => {
                 <ul>
                     {habitats.map((habitat) => (
                         <li key={habitat.id}>
-                            {habitat.name} — Size: {habitat.size} — Climate: {habitat.climate}
+                            {habitat.name} — Size: {habitat.size} — Climate: {habitat.climate} — Animals: {habitat.animals} 
                         </li>
                     ))}
                 </ul>
@@ -46,5 +46,3 @@ export const HabitatList = () => {
 };
 
 export default HabitatList;
-
-
