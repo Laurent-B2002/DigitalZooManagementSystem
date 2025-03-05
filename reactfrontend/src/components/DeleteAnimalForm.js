@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { deleteAnimal } from '../services/api';
 
 export const DeleteAnimalForm = () => {
-    const [species, setSpecies] = useState("");
+    const [name, setName] = useState("");
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState(null);
     const [error, setError] = useState(null);
@@ -12,11 +12,11 @@ export const DeleteAnimalForm = () => {
         setLoading(true);
         setMessage(null);
         setError(null);
-
+        
         try {
-            const response = await deleteAnimal(species);
+            const response = await deleteAnimal(name);
             setMessage(response.message);
-            setSpecies("");
+            setName("");
         } catch (err) {
             setError(err.error || 'Failed to delete animal');
         } finally {
@@ -33,12 +33,12 @@ export const DeleteAnimalForm = () => {
             
             <form onSubmit={handleSubmit}>
                 <div className="form-group">
-                    <label htmlFor="species">Animal Species to Delete:</label>
+                    <label htmlFor="name">Animal Name to Delete:</label>
                     <input
                         type="text"
-                        id="species"
-                        value={species}
-                        onChange={(e) => setSpecies(e.target.value)}
+                        id="name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
                         required
                     />
                 </div>
@@ -51,5 +51,4 @@ export const DeleteAnimalForm = () => {
 };
 
 export default DeleteAnimalForm;
-
 

@@ -20,7 +20,6 @@ export const AnimalList = () => {
                 setLoading(false);
             }
         };
-
         fetchAnimals();
     }, []);
 
@@ -36,7 +35,7 @@ export const AnimalList = () => {
                 <ul>
                     {animals.map((animal) => (
                         <li key={animal.id}>
-                            {animal.species} — {animal.diet} — {animal.lifespan} years — {animal.behaviour} — 
+                            <strong>{animal.name}</strong> (Species: {animal.species}) — {animal.diet} — {animal.lifespan} years — {animal.behaviour} —
                             Habitats: {animal.habitats.join(', ') || "Unknown habitat"}
                         </li>
                     ))}
@@ -47,5 +46,4 @@ export const AnimalList = () => {
 };
 
 export default AnimalList;
-
 

@@ -1,31 +1,43 @@
 import React, { useState, useEffect } from 'react';
-import { updateAnimal, getHabitats } from '../services/api';
+import { updateAnimal, getHabitats, getSpecies } from '../services/api';
 
 export default function UpdateAnimalForm() {
   const [formData, setFormData] = useState({
+    name: "",
+    new_name: "",
     species: "",
-    new_species: "",
     diet: "",
     lifespan: "",
     behaviour: "",
     habitats: []
   });
   const [availableHabitats, setAvailableHabitats] = useState([]);
+  const [availableSpecies, setAvailableSpecies] = useState([]);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [dataLoading, setDataLoading] = useState(true);
 
   useEffect(() => {
-    const fetchHabitats = async () => {
+    const fetchData = async () => {
       try {
-        const habitats = await getHabitats();
+        setDataLoading(true);
+        // Fetch both habitats and species in parallel
+        const [habitats, species] = await Promise.all([
+          getHabitats(),
+          getSpecies()
+        ]);
+        
         setAvailableHabitats(habitats);
+        setAvailableSpecies(species);
       } catch (err) {
-        setError('Failed to load habitats');
+        setError('Failed to load data');
+      } finally {
+        setDataLoading(false);
       }
     };
 
-    fetchHabitats();
+    fetchData();
   }, []);
 
   const handleChange = (e) => {
@@ -52,8 +64,8 @@ export default function UpdateAnimalForm() {
   };
 
   const handleUpdate = async () => {
-    if (!formData.species) {
-      setError("Animal species is required.");
+    if (!formData.name) {
+      setError("Animal name is required.");
       return;
     }
 
@@ -67,7 +79,7 @@ export default function UpdateAnimalForm() {
       
       setFormData({
         ...formData,
-        new_species: "",
+        new_name: "",
         diet: formData.diet,
         lifespan: formData.lifespan,
         behaviour: formData.behaviour,
@@ -80,6 +92,8 @@ export default function UpdateAnimalForm() {
     }
   };
 
+  if (dataLoading) return <p>Loading data...</p>;
+
   return (
     <div className="form-container">
       <h2>Update Animal</h2>
@@ -88,28 +102,45 @@ export default function UpdateAnimalForm() {
       {error && <div className="error-message">{error}</div>}
       
       <div className="form-group">
-        <label htmlFor="species">Current Species Name:</label>
+        <label htmlFor="name">Current Animal Name:</label>
         <input
           type="text"
-          id="species"
-          name="species"
-          value={formData.species}
+          id="name"
+          name="name"
+          value={formData.name}
           onChange={handleChange}
           required
-          placeholder="Enter current species name"
+          placeholder="Enter current animal name"
         />
       </div>
       
       <div className="form-group">
-        <label htmlFor="new_species">New Species Name (optional):</label>
+        <label htmlFor="new_name">New Animal Name (optional):</label>
         <input
           type="text"
-          id="new_species"
-          name="new_species"
-          value={formData.new_species}
+          id="new_name"
+          name="new_name"
+          value={formData.new_name}
           onChange={handleChange}
-          placeholder="Enter new species name"
+          placeholder="Enter new animal name"
         />
+      </div>
+      
+      <div className="form-group">
+        <label htmlFor="species">Species (optional):</label>
+        <select
+          id="species"
+          name="species"
+          value={formData.species}
+          onChange={handleChange}
+        >
+          <option value="">Select a species</option>
+          {availableSpecies.map(species => (
+            <option key={species.id} value={species.name}>
+              {species.name}
+            </option>
+          ))}
+        </select>
       </div>
       
       <div className="form-group">
@@ -176,5 +207,4 @@ export default function UpdateAnimalForm() {
     </div>
   );
 }
-
 

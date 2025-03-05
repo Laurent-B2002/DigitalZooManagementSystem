@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { addAnimal, getHabitats } from '../services/api';
+import { addAnimal, getHabitats, getSpecies } from '../services/api';
 
 function AddAnimalForm() {
   const [formData, setFormData] = useState({
+    name: '',
     species: '',
     diet: '',
     lifespan: '',
@@ -10,24 +11,31 @@ function AddAnimalForm() {
     habitats: []
   });
   const [availableHabitats, setAvailableHabitats] = useState([]);
+  const [availableSpecies, setAvailableSpecies] = useState([]);
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [habitatsLoading, setHabitatsLoading] = useState(true);
+  const [dataLoading, setDataLoading] = useState(true);
 
   useEffect(() => {
-    const fetchHabitats = async () => {
+    const fetchData = async () => {
       try {
-        const habitats = await getHabitats();
+        // Fetch both habitats and species in parallel
+        const [habitats, species] = await Promise.all([
+          getHabitats(),
+          getSpecies()
+        ]);
+        
         setAvailableHabitats(habitats);
+        setAvailableSpecies(species);
       } catch (err) {
-        setError('Failed to load habitats');
+        setError('Failed to load data');
       } finally {
-        setHabitatsLoading(false);
+        setDataLoading(false);
       }
     };
-
-    fetchHabitats();
+    
+    fetchData();
   }, []);
 
   const handleChange = (e) => {
@@ -58,11 +66,12 @@ function AddAnimalForm() {
     setLoading(true);
     setError(null);
     setMessage(null);
-
+    
     try {
       const response = await addAnimal(formData);
       setMessage(response.message);
       setFormData({
+        name: '',
         species: '',
         diet: '',
         lifespan: '',
@@ -76,7 +85,7 @@ function AddAnimalForm() {
     }
   };
 
-  if (habitatsLoading) return <p>Loading habitats...</p>;
+  if (dataLoading) return <p>Loading data...</p>;
 
   return (
     <div className="form-container">
@@ -87,15 +96,33 @@ function AddAnimalForm() {
       
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label htmlFor="species">Species:</label>
+          <label htmlFor="name">Name:</label>
           <input
             type="text"
+            id="name"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        
+        <div className="form-group">
+          <label htmlFor="species">Species:</label>
+          <select
             id="species"
             name="species"
             value={formData.species}
             onChange={handleChange}
             required
-          />
+          >
+            <option value="">Select a species</option>
+            {availableSpecies.map(species => (
+              <option key={species.id} value={species.name}>
+                {species.name}
+              </option>
+            ))}
+          </select>
         </div>
         
         <div className="form-group">
@@ -161,5 +188,4 @@ function AddAnimalForm() {
 }
 
 export default AddAnimalForm;
-
 

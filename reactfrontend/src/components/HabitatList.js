@@ -20,7 +20,6 @@ export const HabitatList = () => {
                 setLoading(false);
             }
         };
-
         fetchHabitats();
     }, []);
 
@@ -36,7 +35,11 @@ export const HabitatList = () => {
                 <ul>
                     {habitats.map((habitat) => (
                         <li key={habitat.id}>
-                            {habitat.name} — Size: {habitat.size} — Climate: {habitat.climate} — Animals: {habitat.animals} 
+                            {habitat.name} — Size: {habitat.size} — Climate: {habitat.climate} — 
+                            Animals: {habitat.animals.length > 0 ? 
+                                habitat.animals.join(', ') : 
+                                "No animals"
+                            }
                         </li>
                     ))}
                 </ul>
@@ -46,3 +49,4 @@ export const HabitatList = () => {
 };
 
 export default HabitatList;
+
