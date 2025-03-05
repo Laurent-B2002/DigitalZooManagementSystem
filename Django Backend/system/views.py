@@ -24,7 +24,7 @@ class TaskViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         task = serializer.save()
-        print(f"Task created: {task.id}, sending email to: {task.zookeeper.email}")
+
         recipient_email = task.zookeeper.email
 
         send_mail(
