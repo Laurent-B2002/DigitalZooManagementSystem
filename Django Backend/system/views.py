@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404
+from rest_framework.exceptions import ValidationError
 from django.http import JsonResponse
 from .models import Animal, Habitat, Zookeeper, Task
 from rest_framework import viewsets
@@ -23,9 +24,19 @@ class TaskViewSet(viewsets.ModelViewSet):
     serializer_class = TaskSerializer
 
     def perform_create(self, serializer):
-        task = serializer.save()
+        data = self.request.data
+        zookeeper_name = data.get("zookeeper")
+        animal_species = data.get("animal")
 
-        recipient_email = task.zookeeper.email
+        try:
+            zookeeper = Zookeeper.objects.get(name=zookeeper_name)
+            animal = Animal.objects.get(species=animal_species)
+        except Zookeeper.DoesNotExist:
+            raise ValidationError({"error": f"Zookeeper '{zookeeper_name}' not found."})
+        except Animal.DoesNotExist:
+            raise ValidationError({"error": f"Animal '{animal_species}' not found."})
+
+        task = serializer.save(zookeeper=zookeeper, animal=animal)
 
         send_mail(
             subject=f"New Task: {task.task_type}",
@@ -36,7 +47,7 @@ class TaskViewSet(viewsets.ModelViewSet):
                     f"Scheduled Time: {task.scheduled_time}\n\n"
                     f"Please complete it on time.",
             from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[recipient_email],
+            recipient_list=[task.zookeeper.email],
         )
 
 

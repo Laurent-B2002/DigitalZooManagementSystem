@@ -17,6 +17,9 @@ class ZookeeperSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class TaskSerializer(serializers.ModelSerializer):
+    zookeeper_name = serializers.CharField(source="zookeeper.name", read_only=True)
+    animal_species = serializers.CharField(source="animal.species", read_only=True)
+
     class Meta:
         model = Task
-        fields = '__all__'
+        fields = ['id', 'task_type', 'description', 'scheduled_time', 'completed', 'zookeeper_name', 'animal_species']

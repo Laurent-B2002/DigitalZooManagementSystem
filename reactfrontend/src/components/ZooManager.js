@@ -7,6 +7,10 @@ import UpdateAnimalForm from './UpdateAnimalForm';
 import UpdateHabitatForm from './UpdateHabitatForm';
 import { DeleteAnimalForm } from './DeleteAnimalForm';
 import { DeleteHabitatForm } from './DeleteHabitatForm';
+import TaskList from './TaskList';
+import AddTaskForm from './AddTaskForm';
+import UpdateTaskForm from './UpdateTaskForm';
+import DeleteTaskForm from './DeleteTaskForm';
 
 function ZooManager() {
   const [activeTab, setActiveTab] = useState('viewAnimals');
@@ -19,78 +23,103 @@ function ZooManager() {
   return (
     <div className="zoo-manager">
       <h1>Zoo Management System</h1>
-      
+
       <div className="tabs">
         <div className="tab-group">
           <h3>View Data</h3>
-          <button 
-            className={activeTab === 'viewAnimals' ? 'active' : ''} 
+          <button
+            className={activeTab === 'viewAnimals' ? 'active' : ''}
             onClick={() => setActiveTab('viewAnimals')}
           >
             View Animals
           </button>
-          <button 
-            className={activeTab === 'viewHabitats' ? 'active' : ''} 
+          <button
+            className={activeTab === 'viewHabitats' ? 'active' : ''}
             onClick={() => setActiveTab('viewHabitats')}
           >
             View Habitats
           </button>
+          <button
+            className={activeTab === 'viewTasks' ? 'active' : ''}
+            onClick={() => setActiveTab('viewTasks')}
+          >
+            View Tasks
+          </button>
         </div>
-        
+
         <div className="tab-group">
           <h3>Add Data</h3>
-          <button 
-            className={activeTab === 'addAnimal' ? 'active' : ''} 
+          <button
+            className={activeTab === 'addAnimal' ? 'active' : ''}
             onClick={() => setActiveTab('addAnimal')}
           >
             Add Animal
           </button>
-          <button 
-            className={activeTab === 'addHabitat' ? 'active' : ''} 
+          <button
+            className={activeTab === 'addHabitat' ? 'active' : ''}
             onClick={() => setActiveTab('addHabitat')}
           >
             Add Habitat
           </button>
+          <button
+            className={activeTab === 'addTask' ? 'active' : ''}
+            onClick={() => setActiveTab('addTask')}
+          >
+            Add Task
+          </button>
         </div>
-        
+
         <div className="tab-group">
           <h3>Update Data</h3>
-          <button 
-            className={activeTab === 'updateAnimal' ? 'active' : ''} 
+          <button
+            className={activeTab === 'updateAnimal' ? 'active' : ''}
             onClick={() => setActiveTab('updateAnimal')}
           >
             Update Animal
           </button>
-          <button 
-            className={activeTab === 'updateHabitat' ? 'active' : ''} 
+          <button
+            className={activeTab === 'updateHabitat' ? 'active' : ''}
             onClick={() => setActiveTab('updateHabitat')}
           >
             Update Habitat
           </button>
+          <button
+            className={activeTab === 'updateTask' ? 'active' : ''}
+            onClick={() => setActiveTab('updateTask')}
+          >
+            Update Task
+          </button>
         </div>
-        
+
         <div className="tab-group">
           <h3>Delete Data</h3>
-          <button 
-            className={activeTab === 'deleteAnimal' ? 'active' : ''} 
+          <button
+            className={activeTab === 'deleteAnimal' ? 'active' : ''}
             onClick={() => setActiveTab('deleteAnimal')}
           >
             Delete Animal
           </button>
-          <button 
-            className={activeTab === 'deleteHabitat' ? 'active' : ''} 
+          <button
+            className={activeTab === 'deleteHabitat' ? 'active' : ''}
             onClick={() => setActiveTab('deleteHabitat')}
           >
             Delete Habitat
           </button>
+          <button
+            className={activeTab === 'deleteTask' ? 'active' : ''}
+            onClick={() => setActiveTab('deleteTask')}
+          >
+            Delete Task
+          </button>
         </div>
       </div>
-      
+
       <div className="tab-content">
         {/* View Components */}
         {activeTab === 'viewAnimals' && <AnimalList key={`animals-${refreshKey}`} />}
         {activeTab === 'viewHabitats' && <HabitatList key={`habitats-${refreshKey}`} />}
-        
+        {activeTab === 'viewTasks' && <TaskList key={`tasks-${refreshKey}`} />}
+
         {/* Add Components */}
         {activeTab === 'addAnimal' && (
           <AddAnimalForm onAnimalAdded={() => {
@@ -104,7 +133,13 @@ function ZooManager() {
             alert("Habitat added successfully! View the updated list in the View Habitats tab.");
           }} />
         )}
-        
+        {activeTab === 'addTask' && (
+          <AddTaskForm onTaskAdded={() => {
+            refreshData();
+            alert("Task added successfully! View the updated list in the View Tasks tab.");
+          }} />
+        )}
+
         {/* Update Components */}
         {activeTab === 'updateAnimal' && (
           <UpdateAnimalForm onAnimalUpdated={() => {
@@ -116,7 +151,12 @@ function ZooManager() {
             refreshData();
           }} />
         )}
-        
+        {activeTab === 'updateTask' && (
+          <UpdateTaskForm onTaskUpdated={() => {
+            refreshData();
+          }} />
+        )}
+
         {/* Delete Components */}
         {activeTab === 'deleteAnimal' && (
           <DeleteAnimalForm onAnimalDeleted={() => {
@@ -125,6 +165,11 @@ function ZooManager() {
         )}
         {activeTab === 'deleteHabitat' && (
           <DeleteHabitatForm onHabitatDeleted={() => {
+            refreshData();
+          }} />
+        )}
+        {activeTab === 'deleteTask' && (
+          <DeleteTaskForm onTaskDeleted={() => {
             refreshData();
           }} />
         )}

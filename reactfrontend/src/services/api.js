@@ -155,4 +155,101 @@ export const getAnimalDetail = async (species) => {
   }
 };
 
+export const getZookeepers = async () => {
+  try {
+    const response = await axios.get(`${API_URL}api/zookeepers/`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching zookeepers:', error);
+    throw error.response ? error.response.data : error;
+  }
+};
+
+export const addZookeeper = async (zookeeperData) => {
+  try {
+    const response = await axios.post(`${API_URL}api/zookeepers/`, zookeeperData);
+    return response.data;
+  } catch (error) {
+    console.error('Error adding zookeeper:', error);
+    throw error.response ? error.response.data : error;
+  }
+};
+
+export const deleteZookeeper = async (name) => {
+  try {
+    const params = new URLSearchParams();
+    params.append('name', name);
+    
+    const response = await axios.get(`${API_URL}zookeepers/delete/?${params.toString()}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting zookeeper:', error);
+    throw error.response ? error.response.data : error;
+  }
+};
+
+export const updateZookeeper = async (zookeeperData) => {
+  try {
+    const params = new URLSearchParams();
+    params.append('name', zookeeperData.name);
+    
+    if (zookeeperData.new_name) {
+      params.append('new_name', zookeeperData.new_name);
+    }
+    if (zookeeperData.role) {
+      params.append('role', zookeeperData.role);
+    }
+    if (zookeeperData.email) {
+      params.append('email', zookeeperData.email);
+    }
+    
+    const response = await axios.get(`${API_URL}zookeepers/update/?${params.toString()}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error updating zookeeper:', error);
+    throw error.response ? error.response.data : error;
+  }
+};
+
+
+export const getTasks = async () => {
+  try {
+    const response = await axios.get(`${API_URL}api/tasks/`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching tasks:', error);
+    throw error.response ? error.response.data : error;
+  }
+};
+
+export const addTask = async (taskData) => {
+  try {
+    const response = await axios.post(`${API_URL}api/tasks/`, taskData);
+    return response.data;
+  } catch (error) {
+    console.error("Error adding task:", error);
+    throw error.response ? error.response.data : error;
+  }
+};
+
+export const updateTask = async (taskId, taskData) => {
+  try {
+    const response = await axios.put(`${API_URL}api/tasks/${taskId}/`, taskData);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating task:", error);
+    throw error.response ? error.response.data : error;
+  }
+};
+
+export const deleteTask = async (taskId) => {
+  try {
+    const response = await axios.delete(`${API_URL}api/tasks/${taskId}/`);
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting task:', error);
+    throw error.response ? error.response.data : error;
+  }
+};
+
 
