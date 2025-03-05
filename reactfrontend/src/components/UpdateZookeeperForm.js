@@ -33,8 +33,7 @@ export default function UpdateZookeeperForm() {
     try {
       const response = await updateZookeeper(formData);
       setMessage(response.message || "Zookeeper updated successfully.");
-      
-      // 清空表单或更新状态
+
       setFormData({
         ...formData,
         new_name: "",
