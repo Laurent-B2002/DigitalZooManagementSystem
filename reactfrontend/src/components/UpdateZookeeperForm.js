@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { updateZookeeper } from '../services/api'; // 导入更新Zookeeper的API
+import { updateZookeeper } from '../services/api';
 
 export default function UpdateZookeeperForm() {
   const [formData, setFormData] = useState({
@@ -31,7 +31,7 @@ export default function UpdateZookeeperForm() {
     setError("");
 
     try {
-      const response = await updateZookeeper(formData); // 调用更新Zookeeper的API
+      const response = await updateZookeeper(formData);
       setMessage(response.message || "Zookeeper updated successfully.");
       
       // 清空表单或更新状态
