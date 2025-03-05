@@ -1,20 +1,21 @@
 import React, { useState } from 'react';
-import { addHabitat } from '../services/api';
+import { addZookeeper } from '../services/api';
 
-function AddHabitatForm() {
+function AddZookeeperForm() {
   const [formData, setFormData] = useState({
     name: '',
-    size: '',
-    climate: ''
+    role: 'L1',
+    email: '',
   });
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [name]: value,
     });
   };
 
@@ -25,12 +26,12 @@ function AddHabitatForm() {
     setMessage(null);
 
     try {
-      const response = await addHabitat(formData);
+      const response = await addZookeeper(formData);
       setMessage(response.message);
       setFormData({
         name: '',
-        size: '',
-        climate: ''
+        role: 'L1',
+        email: '',
       });
     } catch (err) {
       setError(err.error || 'An unexpected error occurred');
@@ -41,14 +42,14 @@ function AddHabitatForm() {
 
   return (
     <div className="form-container">
-      <h2>Add New Habitat</h2>
-      
+      <h2>Add New Zookeeper</h2>
+
       {message && <div className="success-message">{message}</div>}
       {error && <div className="error-message">{error}</div>}
-      
+
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label htmlFor="name">Habitat Name:</label>
+          <label htmlFor="name">Name:</label>
           <input
             type="text"
             id="name"
@@ -58,38 +59,41 @@ function AddHabitatForm() {
             required
           />
         </div>
-        
+
         <div className="form-group">
-          <label htmlFor="size">Size (km^2):</label>
+          <label htmlFor="role">Role:</label>
+          <select
+            id="role"
+            name="role"
+            value={formData.role}
+            onChange={handleChange}
+            required
+          >
+            <option value="L1">Level 1</option>
+            <option value="L2">Level 2</option>
+            <option value="L3">Level 3</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="email">Email:</label>
           <input
-            type="number"
-            id="size"
-            name="size"
-            value={formData.size}
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email}
             onChange={handleChange}
             required
           />
         </div>
-        
-        <div className="form-group">
-          <label htmlFor="climate">Climate:</label>
-          <input
-            type="text"
-            id="climate"
-            name="climate"
-            value={formData.climate}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        
+
         <button type="submit" disabled={loading}>
-          {loading ? 'Adding...' : 'Add Habitat'}
+          {loading ? 'Adding...' : 'Add Zookeeper'}
         </button>
       </form>
     </div>
   );
 }
 
-export default AddHabitatForm;
-
+export default AddZookeeperForm;

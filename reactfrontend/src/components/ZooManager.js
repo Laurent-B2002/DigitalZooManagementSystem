@@ -7,6 +7,10 @@ import UpdateAnimalForm from './UpdateAnimalForm';
 import UpdateHabitatForm from './UpdateHabitatForm';
 import { DeleteAnimalForm } from './DeleteAnimalForm';
 import { DeleteHabitatForm } from './DeleteHabitatForm';
+import ZookeeperList from './ZookeeperList';
+import AddZookeeperForm from './AddZookeeperForm';
+import UpdateZookeeperForm from './UpdateZookeeperForm';
+import DeleteZookeeperForm from './DeleteZookeeperForm';
 
 function ZooManager() {
   const [activeTab, setActiveTab] = useState('viewAnimals');
@@ -35,6 +39,12 @@ function ZooManager() {
           >
             View Habitats
           </button>
+          <button 
+            className={activeTab === 'viewZookeepers' ? 'active' : ''} 
+            onClick={() => setActiveTab('viewZookeepers')}
+          >
+            View Zookeepers
+          </button>
         </div>
         
         <div className="tab-group">
@@ -50,6 +60,12 @@ function ZooManager() {
             onClick={() => setActiveTab('addHabitat')}
           >
             Add Habitat
+          </button>
+          <button 
+            className={activeTab === 'addZookeeper' ? 'active' : ''}
+            onClick={() => setActiveTab('addZookeeper')}
+          >
+            Add Zookeeper
           </button>
         </div>
         
@@ -67,6 +83,12 @@ function ZooManager() {
           >
             Update Habitat
           </button>
+          <button 
+            className={activeTab === 'updateZookeeper' ? 'active' : ''} 
+            onClick={() => setActiveTab('updateZookeeper')}
+          >
+            Update Zookeeper
+          </button>
         </div>
         
         <div className="tab-group">
@@ -83,6 +105,12 @@ function ZooManager() {
           >
             Delete Habitat
           </button>
+          <button 
+            className={activeTab === 'deleteZookeeper' ? 'active' : ''} 
+            onClick={() => setActiveTab('deleteZookeeper')}
+          >
+            Delete Zookeeper
+          </button>
         </div>
       </div>
       
@@ -90,6 +118,7 @@ function ZooManager() {
         {/* View Components */}
         {activeTab === 'viewAnimals' && <AnimalList key={`animals-${refreshKey}`} />}
         {activeTab === 'viewHabitats' && <HabitatList key={`habitats-${refreshKey}`} />}
+        {activeTab === 'viewZookeepers' && <ZookeeperList key={`zookeepers-${refreshKey}`} />}
         
         {/* Add Components */}
         {activeTab === 'addAnimal' && (
@@ -104,6 +133,12 @@ function ZooManager() {
             alert("Habitat added successfully! View the updated list in the View Habitats tab.");
           }} />
         )}
+        {activeTab === 'addZookeeper' && (
+          <AddZookeeperForm onZookeeperAdded={() => {
+            refreshData();
+            alert("Zookeeper added successfully! View the updated list in the View Zookeepers tab.");
+          }} />
+        )}
         
         {/* Update Components */}
         {activeTab === 'updateAnimal' && (
@@ -113,6 +148,11 @@ function ZooManager() {
         )}
         {activeTab === 'updateHabitat' && (
           <UpdateHabitatForm onHabitatUpdated={() => {
+            refreshData();
+          }} />
+        )}
+        {activeTab === 'updateZookeeper' && (
+          <UpdateZookeeperForm onZookeeperUpdated={() => {
             refreshData();
           }} />
         )}
@@ -128,11 +168,14 @@ function ZooManager() {
             refreshData();
           }} />
         )}
+        {activeTab === 'deleteZookeeper' && (
+          <DeleteZookeeperForm onZookeeperDeleted={() => {
+            refreshData();
+          }} />
+        )}
       </div>
     </div>
   );
 }
 
 export default ZooManager;
-
-
