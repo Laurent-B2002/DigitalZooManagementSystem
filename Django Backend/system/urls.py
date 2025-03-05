@@ -22,5 +22,7 @@ urlpatterns = [
     path('animals/update/', views.update_animal, name='update_animal'),
     path('animals/delete/', views.delete_animal, name='delete_animal'),
     path('animals/<str:species>/', views.get_animal_detail, name='get_animal_detail'),
+    path('zookeepers/delete/', views.delete_zookeeper, name='delete_zookeeper'),
+    path('zookeepers/update/', views.update_zookeeper, name='update_zookeeper'),
 ]
 

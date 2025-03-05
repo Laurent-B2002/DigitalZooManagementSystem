@@ -1,16 +1,23 @@
 import React, { useState } from 'react';
 import { AnimalList } from './AnimalList';
 import { HabitatList } from './HabitatList';
+import ZookeeperList from './ZookeeperList';
+import TaskList from './TaskList';
+
 import AddAnimalForm from './AddAnimalForm';
 import AddHabitatForm from './AddHabitatForm';
+import AddZookeeperForm from './AddZookeeperForm';
+import AddTaskForm from './AddTaskForm';
+
 import UpdateAnimalForm from './UpdateAnimalForm';
 import UpdateHabitatForm from './UpdateHabitatForm';
+import UpdateZookeeperForm from './UpdateZookeeperForm';
+import UpdateTaskForm from './UpdateTaskForm';
+
 import { DeleteAnimalForm } from './DeleteAnimalForm';
 import { DeleteHabitatForm } from './DeleteHabitatForm';
-import TaskList from './TaskList';
-import AddTaskForm from './AddTaskForm';
-import UpdateTaskForm from './UpdateTaskForm';
-import DeleteTaskForm from './DeleteTaskForm';
+import { DeleteZookeeperForm } from './DeleteZookeeperForm';
+import DeleteTaskForm  from './DeleteTaskForm';
 
 function ZooManager() {
   const [activeTab, setActiveTab] = useState('viewAnimals');
@@ -27,20 +34,26 @@ function ZooManager() {
       <div className="tabs">
         <div className="tab-group">
           <h3>View Data</h3>
-          <button
-            className={activeTab === 'viewAnimals' ? 'active' : ''}
+          <button 
+            className={activeTab === 'viewAnimals' ? 'active' : ''} 
             onClick={() => setActiveTab('viewAnimals')}
           >
             View Animals
           </button>
-          <button
-            className={activeTab === 'viewHabitats' ? 'active' : ''}
+          <button 
+            className={activeTab === 'viewHabitats' ? 'active' : ''} 
             onClick={() => setActiveTab('viewHabitats')}
           >
             View Habitats
           </button>
-          <button
-            className={activeTab === 'viewTasks' ? 'active' : ''}
+          <button 
+            className={activeTab === 'viewZookeepers' ? 'active' : ''} 
+            onClick={() => setActiveTab('viewZookeepers')}
+          >
+            View Zookeepers
+          </button>
+          <button 
+            className={activeTab === 'viewTasks' ? 'active' : ''} 
             onClick={() => setActiveTab('viewTasks')}
           >
             View Tasks
@@ -49,20 +62,26 @@ function ZooManager() {
 
         <div className="tab-group">
           <h3>Add Data</h3>
-          <button
-            className={activeTab === 'addAnimal' ? 'active' : ''}
+          <button 
+            className={activeTab === 'addAnimal' ? 'active' : ''} 
             onClick={() => setActiveTab('addAnimal')}
           >
             Add Animal
           </button>
-          <button
-            className={activeTab === 'addHabitat' ? 'active' : ''}
+          <button 
+            className={activeTab === 'addHabitat' ? 'active' : ''} 
             onClick={() => setActiveTab('addHabitat')}
           >
             Add Habitat
           </button>
-          <button
-            className={activeTab === 'addTask' ? 'active' : ''}
+          <button 
+            className={activeTab === 'addZookeeper' ? 'active' : ''} 
+            onClick={() => setActiveTab('addZookeeper')}
+          >
+            Add Zookeeper
+          </button>
+          <button 
+            className={activeTab === 'addTask' ? 'active' : ''} 
             onClick={() => setActiveTab('addTask')}
           >
             Add Task
@@ -71,20 +90,26 @@ function ZooManager() {
 
         <div className="tab-group">
           <h3>Update Data</h3>
-          <button
-            className={activeTab === 'updateAnimal' ? 'active' : ''}
+          <button 
+            className={activeTab === 'updateAnimal' ? 'active' : ''} 
             onClick={() => setActiveTab('updateAnimal')}
           >
             Update Animal
           </button>
-          <button
-            className={activeTab === 'updateHabitat' ? 'active' : ''}
+          <button 
+            className={activeTab === 'updateHabitat' ? 'active' : ''} 
             onClick={() => setActiveTab('updateHabitat')}
           >
             Update Habitat
           </button>
-          <button
-            className={activeTab === 'updateTask' ? 'active' : ''}
+          <button 
+            className={activeTab === 'updateZookeeper' ? 'active' : ''} 
+            onClick={() => setActiveTab('updateZookeeper')}
+          >
+            Update Zookeeper
+          </button>
+          <button 
+            className={activeTab === 'updateTask' ? 'active' : ''} 
             onClick={() => setActiveTab('updateTask')}
           >
             Update Task
@@ -93,20 +118,26 @@ function ZooManager() {
 
         <div className="tab-group">
           <h3>Delete Data</h3>
-          <button
-            className={activeTab === 'deleteAnimal' ? 'active' : ''}
+          <button 
+            className={activeTab === 'deleteAnimal' ? 'active' : ''} 
             onClick={() => setActiveTab('deleteAnimal')}
           >
             Delete Animal
           </button>
-          <button
-            className={activeTab === 'deleteHabitat' ? 'active' : ''}
+          <button 
+            className={activeTab === 'deleteHabitat' ? 'active' : ''} 
             onClick={() => setActiveTab('deleteHabitat')}
           >
             Delete Habitat
           </button>
-          <button
-            className={activeTab === 'deleteTask' ? 'active' : ''}
+          <button 
+            className={activeTab === 'deleteZookeeper' ? 'active' : ''} 
+            onClick={() => setActiveTab('deleteZookeeper')}
+          >
+            Delete Zookeeper
+          </button>
+          <button 
+            className={activeTab === 'deleteTask' ? 'active' : ''} 
             onClick={() => setActiveTab('deleteTask')}
           >
             Delete Task
@@ -118,6 +149,7 @@ function ZooManager() {
         {/* View Components */}
         {activeTab === 'viewAnimals' && <AnimalList key={`animals-${refreshKey}`} />}
         {activeTab === 'viewHabitats' && <HabitatList key={`habitats-${refreshKey}`} />}
+        {activeTab === 'viewZookeepers' && <ZookeeperList key={`zookeepers-${refreshKey}`} />}
         {activeTab === 'viewTasks' && <TaskList key={`tasks-${refreshKey}`} />}
 
         {/* Add Components */}
@@ -133,6 +165,12 @@ function ZooManager() {
             alert("Habitat added successfully! View the updated list in the View Habitats tab.");
           }} />
         )}
+        {activeTab === 'addZookeeper' && (
+          <AddZookeeperForm onZookeeperAdded={() => {
+            refreshData();
+            alert("Zookeeper added successfully! View the updated list in the View Zookeepers tab.");
+          }} />
+        )}
         {activeTab === 'addTask' && (
           <AddTaskForm onTaskAdded={() => {
             refreshData();
@@ -141,38 +179,16 @@ function ZooManager() {
         )}
 
         {/* Update Components */}
-        {activeTab === 'updateAnimal' && (
-          <UpdateAnimalForm onAnimalUpdated={() => {
-            refreshData();
-          }} />
-        )}
-        {activeTab === 'updateHabitat' && (
-          <UpdateHabitatForm onHabitatUpdated={() => {
-            refreshData();
-          }} />
-        )}
-        {activeTab === 'updateTask' && (
-          <UpdateTaskForm onTaskUpdated={() => {
-            refreshData();
-          }} />
-        )}
+        {activeTab === 'updateAnimal' && <UpdateAnimalForm onAnimalUpdated={refreshData} />}
+        {activeTab === 'updateHabitat' && <UpdateHabitatForm onHabitatUpdated={refreshData} />}
+        {activeTab === 'updateZookeeper' && <UpdateZookeeperForm onZookeeperUpdated={refreshData} />}
+        {activeTab === 'updateTask' && <UpdateTaskForm onTaskUpdated={refreshData} />}
 
         {/* Delete Components */}
-        {activeTab === 'deleteAnimal' && (
-          <DeleteAnimalForm onAnimalDeleted={() => {
-            refreshData();
-          }} />
-        )}
-        {activeTab === 'deleteHabitat' && (
-          <DeleteHabitatForm onHabitatDeleted={() => {
-            refreshData();
-          }} />
-        )}
-        {activeTab === 'deleteTask' && (
-          <DeleteTaskForm onTaskDeleted={() => {
-            refreshData();
-          }} />
-        )}
+        {activeTab === 'deleteAnimal' && <DeleteAnimalForm onAnimalDeleted={refreshData} />}
+        {activeTab === 'deleteHabitat' && <DeleteHabitatForm onHabitatDeleted={refreshData} />}
+        {activeTab === 'deleteZookeeper' && <DeleteZookeeperForm onZookeeperDeleted={refreshData} />}
+        {activeTab === 'deleteTask' && <DeleteTaskForm onTaskDeleted={refreshData} />}
       </div>
     </div>
   );

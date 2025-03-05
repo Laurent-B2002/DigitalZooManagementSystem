@@ -355,3 +355,63 @@ def get_animal_detail(request, species):
         return JsonResponse({"error": f"No animal found with the species '{species}'."}, status=404)
     except Exception as e:
         return JsonResponse({"error": f"An error occurred: {str(e)}"}, status=500)
+    
+
+def delete_zookeeper(request):
+    name = request.GET.get('name', '').strip()
+    
+    if not name:
+        return JsonResponse({"error": "Name is required to delete the zookeeper."}, status=400)
+    
+    try:
+        zookeeper = get_object_or_404(Zookeeper, name=name)
+        zookeeper.delete()
+        return JsonResponse({"message": f"Zookeeper '{name}' deleted successfully!"}, status=200)
+    except Animal.DoesNotExist:
+        return JsonResponse({"error": f"No zookeeper found with the name '{name}'."}, status=404)
+    except Exception as e:
+        return JsonResponse({"error": f"An error occurred: {str(e)}"}, status=500)
+    
+def update_zookeeper(request):
+    name = request.GET.get('name', '').strip()
+    new_name = request.GET.get('new_name', '').strip()
+    role = request.GET.get('role', '').strip()
+    email = request.GET.get('email', '').strip()
+
+    if not name:
+        return JsonResponse({"error": "Current zookeeper name is required to identify the zookeeper."}, status=400)
+    
+    try:
+        zookeeper = get_object_or_404(Zookeeper, name=name)
+        
+        if new_name:
+            if Zookeeper.objects.filter(name=new_name).exists() and new_name != name:
+                return JsonResponse({"error": f"Zookeeper with name '{new_name}' already exists."}, status=400)
+            zookeeper.name = new_name
+        
+        if role:
+            if role not in dict(Zookeeper.ROLE_TYPES).keys():
+                return JsonResponse({"error": f"Invalid role. Available roles are: {', '.join(dict(Zookeeper.ROLE_TYPES).keys())}"}, status=400)
+            zookeeper.role = role
+            
+        if email:
+            if Zookeeper.objects.filter(email=email).exists() and email != zookeeper.email:
+                return JsonResponse({"error": f"A zookeeper with email '{email}' already exists."}, status=400)
+            zookeeper.email = email
+        
+        zookeeper.save()
+        
+        return JsonResponse({
+            "message": f"Zookeeper '{name}' updated successfully!",
+            "updated_zookeeper": {
+                "id": zookeeper.id,
+                "name": zookeeper.name,
+                "role": zookeeper.role,
+                "email": zookeeper.email
+            }
+        }, status=200)
+    
+    except Zookeeper.DoesNotExist:
+        return JsonResponse({"error": f"No zookeeper found with the name '{name}'."}, status=404)
+    except Exception as e:
+        return JsonResponse({"error": f"An error occurred: {str(e)}"}, status=500)

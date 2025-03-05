@@ -1,30 +1,58 @@
-import React, { useState } from "react";
-import { deleteTask } from "../services/api";
+import React, { useState } from 'react';
+import { deleteTask } from '../services/api';
 
-const TaskDelete = () => {
-  const [taskId, setTaskId] = useState("");
+export const DeleteTaskForm = () => {
+  const [taskId, setTaskId] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState(null);
+  const [error, setError] = useState(null);
 
-  const handleDelete = async () => {
-    if (!window.confirm("Are you sure you want to delete this task?")) return;
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setMessage(null);
+    setError(null);
 
     try {
-      await deleteTask(taskId);
-      alert("Task deleted successfully!");
-      setTaskId("");
-    } catch (error) {
-      console.error("Failed to delete task:", error);
+      const response = await deleteTask(taskId);
+      setMessage(response.message);
+      setTaskId('');
+    } catch (err) {
+      setError(err.error || 'Failed to delete task');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div>
+    <div className="delete-form">
       <h2>Delete Task</h2>
-      <input type="text" value={taskId} onChange={(e) => setTaskId(e.target.value)} placeholder="Task ID" required />
-      <button onClick={handleDelete}>Delete Task</button>
+
+      {message && <div className="success-message">{message}</div>}
+      {error && <div className="error-message">{error}</div>}
+
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label htmlFor="taskId">Task ID to Delete:</label>
+          <input
+            type="number"
+            id="taskId"
+            value={taskId}
+            onChange={(e) => setTaskId(e.target.value)}
+            required
+            placeholder="Enter Task ID"
+          />
+        </div>
+
+        <button type="submit" disabled={loading} className="submit-button">
+          {loading ? 'Deleting...' : 'Delete Task'}
+        </button>
+      </form>
     </div>
   );
 };
 
-export default TaskDelete;
+export default DeleteTaskForm;
+
 
 

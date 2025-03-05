@@ -1,114 +1,196 @@
-import React, { useState, useEffect } from "react";
-import { updateTask, getAnimals, getZookeepers } from "../services/api";
+import React, { useState, useEffect } from 'react';
+import { updateTask, getTasks, getZookeepers, getAnimals } from '../services/api';
 
-const UpdateTaskForm = ({ onTaskUpdated }) => {
-  const [taskId, setTaskId] = useState("");
-  const [taskData, setTaskData] = useState({
-    zookeeper: "",
-    animal: "",
-    task_type: "",
-    description: "",
-    scheduled_time: "",
+export default function UpdateTaskForm() {
+  const [formData, setFormData] = useState({
+    taskId: '',
+    zookeeper: '',
+    animal: '',
+    task_type: '',
+    description: '',
+    scheduled_time: ''
   });
 
-  const [animals, setAnimals] = useState([]);
-  const [zookeepers, setZookeepers] = useState([]);
+  const [tasks, setTasks] = useState([]);
+  const [availableZookeepers, setAvailableZookeepers] = useState([]);
+  const [availableAnimals, setAvailableAnimals] = useState([]);
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [dataLoading, setDataLoading] = useState(true);
 
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const taskList = await getTasks();
+        const zookeepers = await getZookeepers();
+        const animals = await getAnimals();
+        setTasks(taskList);
+        setAvailableZookeepers(zookeepers);
+        setAvailableAnimals(animals);
+      } catch (err) {
+        setError('Failed to load data');
+      } finally {
+        setDataLoading(false);
+      }
+    };
+
     fetchData();
   }, []);
 
-  const fetchData = async () => {
-    try {
-      const animalData = await getAnimals();
-      const zookeeperData = await getZookeepers();
-      setAnimals(animalData);
-      setZookeepers(zookeeperData);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
-
   const handleChange = (e) => {
-    setTaskData({ ...taskData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value
+    });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleTaskSelection = (e) => {
+    const taskId = e.target.value;
+    const selectedTask = tasks.find(task => task.id === parseInt(taskId));
 
-    try {
-      await updateTask(taskId, taskData);
-      alert("Task updated successfully!");
-      setTaskId("");
-      setTaskData({ zookeeper: "", animal: "", task_type: "", description: "", scheduled_time: "" });
-      onTaskUpdated();
-    } catch (error) {
-      console.error("Failed to update task:", error);
+    if (selectedTask) {
+      setFormData({
+        taskId,
+        zookeeper: selectedTask.zookeeper?.name || '',
+        animal: selectedTask.animal?.species || '',
+        task_type: selectedTask.task_type || '',
+        description: selectedTask.description || '',
+        scheduled_time: selectedTask.scheduled_time || ''
+      });
     }
   };
+
+  const handleUpdate = async () => {
+    if (!formData.taskId) {
+      setError('Please select a task to update.');
+      return;
+    }
+
+    setLoading(true);
+    setMessage('');
+    setError('');
+
+    try {
+      const response = await updateTask(formData.taskId, formData);
+      setMessage(response.message || 'Task updated successfully.');
+    } catch (err) {
+      setError(err.error || 'Error updating task: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (dataLoading) return <p>Loading tasks, zookeepers, and animals...</p>;
 
   return (
-    <div>
+    <div className="form-container">
       <h2>Update Task</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          value={taskId}
-          onChange={(e) => setTaskId(e.target.value)}
-          placeholder="Task ID"
-          required
-        />
 
-        {/* Zookeeper Dropdown */}
-        <select name="zookeeper" value={taskData.zookeeper} onChange={handleChange} required>
-          <option value="">Select Zookeeper</option>
-          {zookeepers.map((keeper) => (
-            <option key={keeper.name} value={keeper.name}>
-              {keeper.name}
+      {message && <div className="success-message">{message}</div>}
+      {error && <div className="error-message">{error}</div>}
+
+      <div className="form-group">
+        <label htmlFor="taskId">Select Task to Update:</label>
+        <select
+          id="taskId"
+          name="taskId"
+          value={formData.taskId}
+          onChange={handleTaskSelection}
+          required
+        >
+          <option value="">Choose a task</option>
+          {tasks.map(task => (
+            <option key={task.id} value={task.id}>
+              {task.task_type} - {task.animal_species || 'Unknown'} ({task.zookeeper_name || 'Unknown'})
             </option>
           ))}
         </select>
+      </div>
 
-        {/* Animal Dropdown */}
-        <select name="animal" value={taskData.animal} onChange={handleChange} required>
-          <option value="">Select Animal</option>
-          {animals.map((animal) => (
-            <option key={animal.species} value={animal.species}>
+      <div className="form-group">
+        <label htmlFor="zookeeper">Zookeeper (optional):</label>
+        <select
+          id="zookeeper"
+          name="zookeeper"
+          value={formData.zookeeper}
+          onChange={handleChange}
+        >
+          <option value="">Select a zookeeper</option>
+          {availableZookeepers.map(zookeeper => (
+            <option key={zookeeper.id} value={zookeeper.name}>
+              {zookeeper.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="animal">Animal (optional):</label>
+        <select
+          id="animal"
+          name="animal"
+          value={formData.animal}
+          onChange={handleChange}
+        >
+          <option value="">Select an animal</option>
+          {availableAnimals.map(animal => (
+            <option key={animal.id} value={animal.species}>
               {animal.species}
             </option>
           ))}
         </select>
+      </div>
 
-        <select name="task_type" value={taskData.task_type} onChange={handleChange} required>
-          <option value="">Select Task Type</option>
+      <div className="form-group">
+        <label htmlFor="task_type">Task Type (optional):</label>
+        <select
+          id="task_type"
+          name="task_type"
+          value={formData.task_type}
+          onChange={handleChange}
+        >
+          <option value="">Select a task type</option>
           <option value="FEEDING">Feeding</option>
           <option value="MEDICAL">Medical</option>
           <option value="CLEANING">Cleaning</option>
           <option value="OTHER">Other</option>
         </select>
+      </div>
 
-        <input
-          type="text"
+      <div className="form-group">
+        <label htmlFor="description">Task Description (optional):</label>
+        <textarea
+          id="description"
           name="description"
-          value={taskData.description}
+          value={formData.description}
           onChange={handleChange}
-          placeholder="Description"
-          required
+          placeholder="Enter task description"
         />
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="scheduled_time">Scheduled Time (optional):</label>
         <input
           type="datetime-local"
+          id="scheduled_time"
           name="scheduled_time"
-          value={taskData.scheduled_time}
+          value={formData.scheduled_time}
           onChange={handleChange}
-          required
         />
+      </div>
 
-        <button type="submit">Update Task</button>
-      </form>
+      <button
+        onClick={handleUpdate}
+        disabled={loading}
+        className="submit-button"
+      >
+        {loading ? 'Updating...' : 'Update Task'}
+      </button>
     </div>
   );
-};
+}
 
-export default UpdateTaskForm;
 
 

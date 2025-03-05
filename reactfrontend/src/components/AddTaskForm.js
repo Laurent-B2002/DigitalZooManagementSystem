@@ -1,91 +1,163 @@
-import React, { useState, useEffect } from "react";
-import { addTask, getAnimals, getZookeepers } from "../services/api";
+import React, { useState, useEffect } from 'react';
+import { addTask, getZookeepers, getAnimals } from '../services/api';
 
-const AddTaskForm = ({ onTaskAdded }) => {
-  const [task, setTask] = useState({
-    zookeeper: "",
-    animal: "",
-    task_type: "",
-    description: "",
-    scheduled_time: "",
+function AddTaskForm() {
+  const [formData, setFormData] = useState({
+    zookeeper: '',
+    animal: '',
+    task_type: '',
+    description: '',
+    scheduled_time: ''
   });
 
-  const [animals, setAnimals] = useState([]);
-  const [zookeepers, setZookeepers] = useState([]);
+  const [availableZookeepers, setAvailableZookeepers] = useState([]);
+  const [availableAnimals, setAvailableAnimals] = useState([]);
+  const [message, setMessage] = useState(null);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [dataLoading, setDataLoading] = useState(true);
 
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const zookeepers = await getZookeepers();
+        const animals = await getAnimals();
+        setAvailableZookeepers(zookeepers);
+        setAvailableAnimals(animals);
+      } catch (err) {
+        setError('Failed to load data');
+      } finally {
+        setDataLoading(false);
+      }
+    };
+
     fetchData();
   }, []);
 
-  const fetchData = async () => {
-    try {
-      const animalData = await getAnimals();
-      const zookeeperData = await getZookeepers();
-      setAnimals(animalData);
-      setZookeepers(zookeeperData);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
-
   const handleChange = (e) => {
-    setTask({ ...task, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError(null);
+    setMessage(null);
 
     try {
-      await addTask(task);
-      alert("Task added successfully!");
-      setTask({ zookeeper: "", animal: "", task_type: "", description: "", scheduled_time: "" });
-      onTaskAdded();
-    } catch (error) {
-      console.error("Failed to add task:", error);
+      const response = await addTask(formData);
+      setMessage(response.message);
+      setFormData({
+        zookeeper: '',
+        animal: '',
+        task_type: '',
+        description: '',
+        scheduled_time: ''
+      });
+    } catch (err) {
+      setError(err.error || 'An unexpected error occurred');
+    } finally {
+      setLoading(false);
     }
   };
 
+  if (dataLoading) return <p>Loading zookeepers and animals...</p>;
+
   return (
-    <div>
-      <h2>Add Task</h2>
+    <div className="form-container">
+      <h2>Add New Task</h2>
+
+      {message && <div className="success-message">{message}</div>}
+      {error && <div className="error-message">{error}</div>}
+
       <form onSubmit={handleSubmit}>
-        {/* Zookeeper Dropdown */}
-        <select name="zookeeper" value={task.zookeeper} onChange={handleChange} required>
-          <option value="">Select Zookeeper</option>
-          {zookeepers.map((keeper) => (
-            <option key={keeper.name} value={keeper.name}>
-              {keeper.name}
-            </option>
-          ))}
-        </select>
+        <div className="form-group">
+          <label htmlFor="zookeeper">Zookeeper:</label>
+          <select
+            id="zookeeper"
+            name="zookeeper"
+            value={formData.zookeeper}
+            onChange={handleChange}
+            required
+          >
+            <option value="">Select a zookeeper</option>
+            {availableZookeepers.map(zookeeper => (
+              <option key={zookeeper.id} value={zookeeper.name}>
+                {zookeeper.name}
+              </option>
+            ))}
+          </select>
+        </div>
 
-        {/* Animal Dropdown */}
-        <select name="animal" value={task.animal} onChange={handleChange} required>
-          <option value="">Select Animal</option>
-          {animals.map((animal) => (
-            <option key={animal.species} value={animal.species}>
-              {animal.species}
-            </option>
-          ))}
-        </select>
+        <div className="form-group">
+          <label htmlFor="animal">Animal:</label>
+          <select
+            id="animal"
+            name="animal"
+            value={formData.animal}
+            onChange={handleChange}
+            required
+          >
+            <option value="">Select an animal</option>
+            {availableAnimals.map(animal => (
+              <option key={animal.id} value={animal.species}>
+                {animal.species}
+              </option>
+            ))}
+          </select>
+        </div>
 
-        {/* Task Type Dropdown */}
-        <select name="task_type" value={task.task_type} onChange={handleChange} required>
-          <option value="">Select Task Type</option>
-          <option value="FEEDING">Feeding</option>
-          <option value="MEDICAL">Medical</option>
-          <option value="CLEANING">Cleaning</option>
-          <option value="OTHER">Other</option>
-        </select>
+        <div className="form-group">
+          <label htmlFor="task_type">Task Type:</label>
+          <select
+            id="task_type"
+            name="task_type"
+            value={formData.task_type}
+            onChange={handleChange}
+            required
+          >
+            <option value="">Select a task type</option>
+            <option value="FEEDING">Feeding</option>
+            <option value="MEDICAL">Medical</option>
+            <option value="CLEANING">Cleaning</option>
+            <option value="OTHER">Other</option>
+          </select>
+        </div>
 
-        <input type="text" name="description" value={task.description} onChange={handleChange} placeholder="Description" required />
-        <input type="datetime-local" name="scheduled_time" value={task.scheduled_time} onChange={handleChange} required />
+        <div className="form-group">
+          <label htmlFor="description">Task Description:</label>
+          <textarea
+            id="description"
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            required
+          />
+        </div>
 
-        <button type="submit">Add Task</button>
+        <div className="form-group">
+          <label htmlFor="scheduled_time">Scheduled Time:</label>
+          <input
+            type="datetime-local"
+            id="scheduled_time"
+            name="scheduled_time"
+            value={formData.scheduled_time}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <button type="submit" disabled={loading}>
+          {loading ? 'Adding...' : 'Add Task'}
+        </button>
       </form>
     </div>
   );
-};
+}
 
 export default AddTaskForm;
 
