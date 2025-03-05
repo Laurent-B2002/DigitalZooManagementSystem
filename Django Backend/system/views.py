@@ -4,15 +4,16 @@ from .models import Animal, Habitat
 
 def get_habitats(request):
     habitats = Habitat.objects.all()
-    data = [
-        {
-            "id": habitat.id,
-            "name": habitat.name,
-            "size": habitat.size,
-            "climate": habitat.climate
-        }
-        for habitat in habitats
-    ]
+
+    data = []
+    for habitat in habitats:
+        animals = habitat.animal_set.all()
+        data.append({
+            'id': habitat.id,
+            'name': habitat.name, 
+            'size': habitat.size,
+            'climate': habitat.climate,
+            'animals': [f'{animal.species}, ' for animal in animals]})
     return JsonResponse(data, safe=False)
 
 def add_habitat(request):
