@@ -1,8 +1,10 @@
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
-from .models import Animal, Habitat
+from .models import Animal, Habitat, Zookeeper, Task
 from rest_framework import viewsets
-from .serializers import HabitatSerializer, AnimalSerializer
+from .serializers import HabitatSerializer, AnimalSerializer, ZookeeperSerializer, TaskSerializer
+from django.core.mail import send_mail
+from django.conf import settings
 
 class HabitatViewSet(viewsets.ModelViewSet):
     queryset = Habitat.objects.all()
@@ -12,17 +14,43 @@ class AnimalViewSet(viewsets.ModelViewSet):
     queryset = Animal.objects.all()
     serializer_class = AnimalSerializer
 
+class ZookeeperViewSet(viewsets.ModelViewSet):
+    queryset = Zookeeper.objects.all()
+    serializer_class = ZookeeperSerializer
+
+class TaskViewSet(viewsets.ModelViewSet):
+    queryset = Task.objects.all()
+    serializer_class = TaskSerializer
+
+    def perform_create(self, serializer):
+        task = serializer.save()
+        print(f"Task created: {task.id}, sending email to: {task.zookeeper.email}")
+        recipient_email = task.zookeeper.email
+
+        send_mail(
+            subject=f"New Task: {task.task_type}",
+            message=f"Hello {task.zookeeper.name},\n\nYou have been assigned a new task:\n\n"
+                    f"Animal: {task.animal.species}\n"
+                    f"Task Type: {task.get_task_type_display()}\n"
+                    f"Description: {task.description}\n"
+                    f"Scheduled Time: {task.scheduled_time}\n\n"
+                    f"Please complete it on time.",
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[recipient_email],
+        )
+
+
 def get_habitats(request):
     habitats = Habitat.objects.all()
-    data = [
-        {
-            "id": habitat.id,
-            "name": habitat.name,
-            "size": habitat.size,
-            "climate": habitat.climate
-        }
-        for habitat in habitats
-    ]
+    data = []
+    for habitat in habitats:
+        animals = habitat.animal_set.all()
+        data.append({
+            'id': habitat.id,
+            'name': habitat.name, 
+            'size': habitat.size,
+            'climate': habitat.climate,
+            'animals': [f'{animal.species}, ' for animal in animals]})
     return JsonResponse(data, safe=False)
 
 def add_habitat(request):
