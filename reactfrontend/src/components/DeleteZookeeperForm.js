@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { deleteZookeeper } from '../services/api';
 
 export const DeleteZookeeperForm = () => {
-    const [name, setName] = useState(""); // 用名字删除 Zookeeper
+    const [name, setName] = useState("");
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState(null);
     const [error, setError] = useState(null);
@@ -14,10 +14,9 @@ export const DeleteZookeeperForm = () => {
         setError(null);
 
         try {
-            // 调用删除 Zookeeper 的 API，传递名字
             const response = await deleteZookeeper(name);
-            setMessage(response.message); // 假设后端返回一个成功的消息
-            setName(""); // 删除成功后清空输入框
+            setMessage(response.message);
+            setName("");
         } catch (err) {
             setError(err.error || 'Failed to delete zookeeper');
         } finally {
