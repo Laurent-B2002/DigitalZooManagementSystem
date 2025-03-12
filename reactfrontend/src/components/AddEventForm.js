@@ -47,7 +47,7 @@ function AddEventForm() {
     }
     setFormData({
         ...formData,
-        habitats: selectedValues
+        memberships: selectedValues
       });
     };
 
@@ -117,12 +117,12 @@ function AddEventForm() {
             onChange={handleMembershipChange}
           >
             {availableMemberships.map(membership => (
-              <option key={membership.id} value={membership.name}>
-                {membership.name}
+              <option key={membership.id} value={membership.role}>
+                {membership.role}
               </option>
             ))}
           </select>
-          <small>Hold Ctrl (or Cmd on Mac) to select multiple habitats</small>
+          <small>Hold Ctrl (or Cmd on Mac) to select multiple memberships</small>
         </div>
 
         <button type="submit" disabled={loading}>
