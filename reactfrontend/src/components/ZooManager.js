@@ -15,6 +15,7 @@ import UpdateAnimalForm from './UpdateAnimalForm';
 import UpdateHabitatForm from './UpdateHabitatForm';
 import UpdateZookeeperForm from './UpdateZookeeperForm';
 import UpdateTaskForm from './UpdateTaskForm';
+import UpdateEventForm from './UpdateEventForm';
 
 import { DeleteAnimalForm } from './DeleteAnimalForm';
 import { DeleteHabitatForm } from './DeleteHabitatForm';
@@ -129,6 +130,12 @@ function ZooManager() {
           >
             Update Task
           </button>
+          <button 
+            className={activeTab === 'updateEvent' ? 'active' : ''} 
+            onClick={() => setActiveTab('updateEvent')}
+          >
+            Update Event
+          </button>
         </div>
 
         <div className="tab-group">
@@ -211,6 +218,7 @@ function ZooManager() {
         {activeTab === 'updateHabitat' && <UpdateHabitatForm onHabitatUpdated={refreshData} />}
         {activeTab === 'updateZookeeper' && <UpdateZookeeperForm onZookeeperUpdated={refreshData} />}
         {activeTab === 'updateTask' && <UpdateTaskForm onTaskUpdated={refreshData} />}
+        {activeTab === 'updateEvent' && <UpdateEventForm onEventUpdated={refreshData} />}
 
         {/* Delete Components */}
         {activeTab === 'deleteAnimal' && <DeleteAnimalForm onAnimalDeleted={refreshData} />}
