@@ -25,7 +25,7 @@ const TaskList = () => {
         {tasks.length === 0 ? <p>No tasks available.</p> : null}
         {tasks.map((task, index) => (
           <li key={index}>
-            <strong>{task.task_type}</strong> - {task.animal_species || "Unknown Animal"} 
+            No.{task.id} - <strong>{task.task_type}</strong> - {task.animal_species || "Unknown Animal"} 
             ({task.zookeeper_name || "Unknown Zookeeper"})
             <br />
             <small>{task.description} | Scheduled: {new Date(task.scheduled_time).toLocaleString()}</small>
