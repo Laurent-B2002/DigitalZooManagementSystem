@@ -25,7 +25,9 @@ const EventList = () => {
         {events.length === 0 ? <p>No events available.</p> : null}
         {events.map((event, index) => (
           <li key={index}>
-            No.{event.id} - <strong>{event.name}</strong> - {event.memberships || "Unknown Membership"} 
+            No.{event.id} - <strong>{event.name}</strong>
+            <br />
+            <small>| Memberships: {event.memberships.join(", ") || "Unknown Membership"}</small>
             <br />
             <small>| Scheduled: {new Date(event.time).toLocaleString()}</small>
           </li>
