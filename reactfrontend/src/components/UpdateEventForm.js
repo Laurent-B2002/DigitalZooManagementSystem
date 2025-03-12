@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { updateEvent, getEvents } from '../services/api';
+import { updateEvent, getEvents, getMemberships } from '../services/api';
 
 export default function UpdateEventForm() {
   const [formData, setFormData] = useState({
     eventId: '',
     name: '',
     time: '',
+    memberships: []
   });
 
   const [events, setEvents] = useState([]);
@@ -44,10 +45,18 @@ export default function UpdateEventForm() {
     const selectedEvent = events.find((event) => event.id === parseInt(eventId));
 
     if (selectedEvent) {
+
+      let formattedTime = '';
+      if (selectedEvent.time) {
+        const date = new Date(selectedEvent.time);
+        formattedTime = date.toISOString().slice(0, 16)
+      }
+
       setFormData({
         eventId,
         name: selectedEvent.name || '',
-        time: selectedEvent.time || '',
+        time: formattedTime,
+        memberships: selectedEvent.memberships || []
       });
     }
   };
@@ -63,14 +72,23 @@ export default function UpdateEventForm() {
     setError('');
 
     try {
-      const response = await updateEvent(formData.eventId, formData);
-      setMessage(response.message || 'Event updated successfully.');
+      const eventData = {
+        name: formData.name,
+        time: formData.time,
+        memberships: formData.memberships
+      };
+
+      console.log('Updating event with data:', eventData);
+      const response = await updateEvent(formData.eventId, eventData);
+
+      setMessage('Event updated successfully!');
+      console.log('Update response:', response);
     } catch (err) {
-      setError(err.error || 'Error updating event: ' + err.message);
-    } finally {
-      setLoading(false);
+      console.error('Full error:', err);
+
+      
     }
-  };
+  }
 
   if (dataLoading) return <p>Loading events...</p>;
 
