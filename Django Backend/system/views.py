@@ -1,9 +1,9 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import ValidationError
 from django.http import JsonResponse
-from .models import Animal, Habitat, Zookeeper, Task
+from .models import Animal, Habitat, Zookeeper, Task, Membership, Visitor, Event, EventFeedback
 from rest_framework import viewsets
-from .serializers import HabitatSerializer, AnimalSerializer, ZookeeperSerializer, TaskSerializer
+from .serializers import HabitatSerializer, AnimalSerializer, ZookeeperSerializer, TaskSerializer, MembershipSerializer, VisitorSerializer, EventSerializer, EventFeedbackSerializer
 from django.core.mail import send_mail
 from django.conf import settings
 
@@ -50,6 +50,21 @@ class TaskViewSet(viewsets.ModelViewSet):
             recipient_list=[task.zookeeper.email],
         )
 
+class MembershipViewSet(viewsets.ModelViewSet):
+    queryset = Membership.objects.all()
+    serializer_class = MembershipSerializer
+
+class VisitorViewSet(viewsets.ModelViewSet):
+    queryset = Visitor.objects.all()
+    serializer_class = VisitorSerializer
+
+class EventViewSet(viewsets.ModelViewSet):
+    queryset = Event.objects.all()
+    serializer_class = EventSerializer
+
+class EventFeedbackViewSet(viewsets.ModelViewSet):
+    queryset = EventFeedback.objects.all()
+    serializer_class = EventFeedbackSerializer
 
 def get_habitats(request):
     habitats = Habitat.objects.all()

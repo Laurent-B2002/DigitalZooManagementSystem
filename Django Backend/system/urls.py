@@ -1,7 +1,8 @@
 from django.urls import path, include
 from . import views
 from rest_framework.routers import DefaultRouter
-from .views import HabitatViewSet, AnimalViewSet, ZookeeperViewSet, TaskViewSet
+from .views import HabitatViewSet, AnimalViewSet, ZookeeperViewSet, TaskViewSet, MembershipViewSet, VisitorViewSet, EventViewSet, EventFeedbackViewSet
+
 
 
 router = DefaultRouter()
@@ -9,6 +10,10 @@ router.register(r'habitats', HabitatViewSet)
 router.register(r'animals', AnimalViewSet)
 router.register(r'zookeepers', ZookeeperViewSet)
 router.register(r'tasks', TaskViewSet)
+router.register(r'membership', MembershipViewSet)
+router.register(r'visitor', VisitorViewSet)
+router.register(r'event', EventViewSet)
+router.register(r'eventfeedback', EventFeedbackViewSet)
 
 urlpatterns = [
     path('api/', include(router.urls)),

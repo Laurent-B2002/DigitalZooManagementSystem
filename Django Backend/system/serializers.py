@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Habitat, Animal, Zookeeper, Task
+from .models import Habitat, Animal, Zookeeper, Task, Membership, Visitor, Event, EventFeedback
 
 class HabitatSerializer(serializers.ModelSerializer):
     class Meta:
@@ -23,3 +23,27 @@ class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
         fields = ['id', 'task_type', 'description', 'scheduled_time', 'completed', 'zookeeper_name', 'animal_species']
+
+class MembershipSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Membership
+        fields = '__all__'
+
+class VisitorSerializer(serializers.ModelSerializer):
+    membership = MembershipSerializer()
+    class Meta:
+        model = Visitor
+        fields = '__all__'
+
+class EventSerializer(serializers.ModelSerializer):
+    attend = VisitorSerializer(many=True)
+    class Meta:
+        model = Event
+        fields = '__all__'
+
+class EventFeedbackSerializer(serializers.ModelSerializer):
+    event = EventSerializer()
+    visitor = VisitorSerializer()
+    class Meta:
+        model = EventFeedback
+        fields = '__all__'
