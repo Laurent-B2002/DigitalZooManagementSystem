@@ -20,6 +20,7 @@ import { DeleteAnimalForm } from './DeleteAnimalForm';
 import { DeleteHabitatForm } from './DeleteHabitatForm';
 import { DeleteZookeeperForm } from './DeleteZookeeperForm';
 import DeleteTaskForm  from './DeleteTaskForm';
+import DeleteEventForm  from './DeleteEventForm';
 
 function ZooManager() {
   const [activeTab, setActiveTab] = useState('viewAnimals');
@@ -156,6 +157,12 @@ function ZooManager() {
           >
             Delete Task
           </button>
+          <button 
+            className={activeTab === 'deleteEvent' ? 'active' : ''} 
+            onClick={() => setActiveTab('deleteEvent')}
+          >
+            Delete Event
+          </button>
         </div>
       </div>
 
@@ -210,6 +217,7 @@ function ZooManager() {
         {activeTab === 'deleteHabitat' && <DeleteHabitatForm onHabitatDeleted={refreshData} />}
         {activeTab === 'deleteZookeeper' && <DeleteZookeeperForm onZookeeperDeleted={refreshData} />}
         {activeTab === 'deleteTask' && <DeleteTaskForm onTaskDeleted={refreshData} />}
+        {activeTab === 'deleteEvent' && <DeleteEventForm onEventDeleted={refreshData} />}
       </div>
     </div>
   );

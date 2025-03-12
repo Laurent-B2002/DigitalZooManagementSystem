@@ -5,7 +5,7 @@ function AddEventForm() {
   const [formData, setFormData] = useState({
     memberships: [],
     name: '',
-    scheduled_time: ''
+    time: ''
   });
 
   const [availableMemberships, setAvailableMemberships] = useState([]);
@@ -64,7 +64,7 @@ function AddEventForm() {
       setFormData({
         memberships: '',
         name: '',
-        scheduled_time: ''
+        time: ''
       });
     } catch (err) {
       setError(err.error || 'An unexpected error occurred');
@@ -96,12 +96,12 @@ function AddEventForm() {
         </div>
 
         <div className="form-group">
-          <label htmlFor="scheduled_time">Scheduled Time:</label>
+          <label htmlFor="time">Scheduled Time:</label>
           <input
             type="datetime-local"
-            id="scheduled_time"
-            name="scheduled_time"
-            value={formData.scheduled_time}
+            id="time"
+            name="time"
+            value={formData.time}
             onChange={handleChange}
             required
           />

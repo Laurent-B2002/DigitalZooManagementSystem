@@ -27,7 +27,7 @@ const EventList = () => {
           <li key={index}>
             No.{event.id} - <strong>{event.name}</strong> - {event.memberships || "Unknown Membership"} 
             <br />
-            <small>| Scheduled: {new Date(event.scheduled_time).toLocaleString()}</small>
+            <small>| Scheduled: {new Date(event.time).toLocaleString()}</small>
           </li>
         ))}
       </ul>

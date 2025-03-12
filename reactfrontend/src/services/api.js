@@ -275,10 +275,18 @@ export const getEvents = async () => {
 
 export const addEvent = async (eventData) => {
   try {
-    const response = await axios.post(`${API_URL}api/event/`, eventData);
+    const params = new URLSearchParams();
+    params.append('name', eventData.name);
+    params.append('time', eventData.time);
+    
+    if (eventData.memberships && eventData.memberships.length > 0) {
+      params.append('memberships', eventData.memberships.join(','));
+    }
+    
+    const response = await axios.get(`${API_URL}events/add/?${params.toString()}`);
     return response.data;
   } catch (error) {
-    console.error("Error adding event:", error);
+    console.error('Error adding event:', error);
     throw error.response ? error.response.data : error;
   }
 };

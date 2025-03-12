@@ -430,3 +430,37 @@ def update_zookeeper(request):
         return JsonResponse({"error": f"No zookeeper found with the name '{name}'."}, status=404)
     except Exception as e:
         return JsonResponse({"error": f"An error occurred: {str(e)}"}, status=500)
+
+
+def add_event(request):
+    name = request.GET.get('name', '').strip()
+    time = request.GET.get('time', '').strip()
+    memberships = request.GET.get('habitats', '').strip()
+    print(time)
+    event = Event.objects.create(
+        name=name,
+        time=time,
+    )
+    
+    if memberships:
+        membership_names = [h.strip() for h in memberships.split(',')]
+        found_membership = Membership.objects.filter(name__in=membership_names)
+        
+        if len(found_membership) != len(membership_names):
+            missing = set(membership_names) - set(h.name for h in found_membership)
+            event.delete()  
+            return JsonResponse({
+                "error": f"Some memberships were not found: {', '.join(missing)}"
+            }, status=404)
+        
+        event.memberships.set(found_membership)
+    
+    return JsonResponse({
+        "message": "Event created successfully!",
+        "animal": {
+            "id": event.id,
+            "name": event.name,
+            "time": event.time,
+            "memberships": [membership.name for membership in event.memberships.all()]
+        }
+    }, status=201)
