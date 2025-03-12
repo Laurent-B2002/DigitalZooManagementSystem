@@ -115,8 +115,9 @@ class Visitor(AbstractBaseUser):
 class Event(models.Model):
     name = models.CharField(max_length=100, unique=True)
     time = models.DateTimeField()
-    price = models.DecimalField(max_digits=10, decimal_places=2)
-    attend = models.ManyToManyField(Visitor, related_name='events')
+    # price = models.DecimalField(max_digits=10, decimal_places=2)
+    # attend = models.ManyToManyField(Visitor, related_name='events')
+    memberships = models.ManyToManyField(Membership, related_name='events')
 
     def discounted(self, visitor):
         if visitor.membership and visitor.membership.discount:
