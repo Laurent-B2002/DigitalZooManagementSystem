@@ -253,3 +253,53 @@ export const deleteTask = async (taskId) => {
 };
 
 
+export const getMemberships = async () => {
+  try {
+    const response = await axios.get(`${API_URL}api/membership/`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching memberships:', error);
+    throw error.response ? error.response.data : error;
+  }
+};
+
+export const getEvents = async () => {
+  try {
+    const response = await axios.get(`${API_URL}api/event/`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching events:', error);
+    throw error.response ? error.response.data : error;
+  }
+};
+
+export const addEvent = async (eventData) => {
+  try {
+    const response = await axios.post(`${API_URL}api/event/`, eventData);
+    return response.data;
+  } catch (error) {
+    console.error("Error adding event:", error);
+    throw error.response ? error.response.data : error;
+  }
+};
+
+export const updateEvent = async (eventId, eventData) => {
+  try {
+    const response = await axios.put(`${API_URL}api/event/${eventId}/`, eventData);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating event:", error);
+    throw error.response ? error.response.data : error;
+  }
+};
+
+export const deleteEvent = async (eventId) => {
+  try {
+    const response = await axios.delete(`${API_URL}api/event/${eventId}/`);
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting event:', error);
+    throw error.response ? error.response.data : error;
+  }
+};
+

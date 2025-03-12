@@ -36,7 +36,6 @@ class VisitorSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class EventSerializer(serializers.ModelSerializer):
-    attend = VisitorSerializer(many=True)
     class Meta:
         model = Event
         fields = '__all__'

@@ -3,11 +3,13 @@ import { AnimalList } from './AnimalList';
 import { HabitatList } from './HabitatList';
 import ZookeeperList from './ZookeeperList';
 import TaskList from './TaskList';
+import EventList from './EventList';
 
 import AddAnimalForm from './AddAnimalForm';
 import AddHabitatForm from './AddHabitatForm';
 import AddZookeeperForm from './AddZookeeperForm';
 import AddTaskForm from './AddTaskForm';
+import AddEventForm from './AddEventForm';
 
 import UpdateAnimalForm from './UpdateAnimalForm';
 import UpdateHabitatForm from './UpdateHabitatForm';
@@ -58,6 +60,12 @@ function ZooManager() {
           >
             View Tasks
           </button>
+          <button 
+            className={activeTab === 'viewEvents' ? 'active' : ''} 
+            onClick={() => setActiveTab('viewEvents')}
+          >
+            View Events
+          </button>
         </div>
 
         <div className="tab-group">
@@ -85,6 +93,12 @@ function ZooManager() {
             onClick={() => setActiveTab('addTask')}
           >
             Add Task
+          </button>
+          <button 
+            className={activeTab === 'addEvent' ? 'active' : ''} 
+            onClick={() => setActiveTab('addEvent')}
+          >
+            Add Event
           </button>
         </div>
 
@@ -151,6 +165,7 @@ function ZooManager() {
         {activeTab === 'viewHabitats' && <HabitatList key={`habitats-${refreshKey}`} />}
         {activeTab === 'viewZookeepers' && <ZookeeperList key={`zookeepers-${refreshKey}`} />}
         {activeTab === 'viewTasks' && <TaskList key={`tasks-${refreshKey}`} />}
+        {activeTab === 'viewEvents' && <EventList key={`events-${refreshKey}`} />}
 
         {/* Add Components */}
         {activeTab === 'addAnimal' && (
@@ -175,6 +190,12 @@ function ZooManager() {
           <AddTaskForm onTaskAdded={() => {
             refreshData();
             alert("Task added successfully! View the updated list in the View Tasks tab.");
+          }} />
+        )}
+        {activeTab === 'addEvent' && (
+          <AddEventForm onEventAdded={() => {
+            refreshData();
+            alert("Event added successfully! View the updated list in the View Events tab.");
           }} />
         )}
 
