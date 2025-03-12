@@ -435,32 +435,35 @@ def update_zookeeper(request):
 def add_event(request):
     name = request.GET.get('name', '').strip()
     time = request.GET.get('time', '').strip()
-    memberships = request.GET.get('habitats', '').strip()
-    print(time)
-    event = Event.objects.create(
-        name=name,
-        time=time,
-    )
-    
-    if memberships:
-        membership_names = [h.strip() for h in memberships.split(',')]
-        found_membership = Membership.objects.filter(name__in=membership_names)
-        
-        if len(found_membership) != len(membership_names):
-            missing = set(membership_names) - set(h.name for h in found_membership)
-            event.delete()  
-            return JsonResponse({
-                "error": f"Some memberships were not found: {', '.join(missing)}"
-            }, status=404)
-        
-        event.memberships.set(found_membership)
-    
-    return JsonResponse({
-        "message": "Event created successfully!",
-        "animal": {
-            "id": event.id,
-            "name": event.name,
-            "time": event.time,
-            "memberships": [membership.name for membership in event.memberships.all()]
-        }
-    }, status=201)
+    membership_roles = request.GET.get('memberships', '').strip().split(",")
+    try: 
+        memberships = Membership.objects.filter(role__in=membership_roles)
+        visitors = Visitor.objects.filter(membership__in=memberships).values('name', 'email')
+        visitor_list = list(visitors)
+        emails = [visitor['email'] for visitor in visitors]
+        print(visitor_list)
+        event = Event.objects.create(
+            name=name,
+            time=time,
+            )
+        event.memberships.set(memberships)
+        send_mail(
+            subject=f"New Event: {event.name}",
+            message=f"Hello dear member!\n\nWe would like to inform you that there is a new event!\n"
+                    f"Time: {event.time}\n"
+                    "We hope you are looking forward to it!",
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=emails,
+        )
+        return JsonResponse({
+            "message": "Event created successfully!",
+            "animal": {
+                "id": event.id,
+                "name": event.name,
+                "time": event.time,
+                "memberships": [membership.role for membership in event.memberships.all()],
+                "visitors": visitor_list
+            }
+        }, status=201)
+    except Exception as e:
+        return JsonResponse({"error": f"An error occurred: {e}"}, status=500)

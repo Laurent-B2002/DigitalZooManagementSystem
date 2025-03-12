@@ -304,7 +304,7 @@ export const updateEvent = async (eventId, eventData) => {
 export const deleteEvent = async (eventId) => {
   try {
     const response = await axios.delete(`${API_URL}api/event/${eventId}/`);
-    return response.data;
+    return { message: `Event with ID ${eventId} deleted successfully!` };;
   } catch (error) {
     console.error('Error deleting event:', error);
     throw error.response ? error.response.data : error;
