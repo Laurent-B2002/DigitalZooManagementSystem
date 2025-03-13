@@ -30,7 +30,9 @@ class MembershipSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class VisitorSerializer(serializers.ModelSerializer):
-    membership = MembershipSerializer()
+    membership = serializers.PrimaryKeyRelatedField(
+        queryset=Membership.objects.all(), allow_null=True
+    )
     class Meta:
         model = Visitor
         fields = '__all__'

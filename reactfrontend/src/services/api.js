@@ -311,3 +311,30 @@ export const deleteEvent = async (eventId) => {
   }
 };
 
+export const addVisitor = async (visitorData) => {
+  try {
+    const response = await axios.post(`${API_URL}api/visitor/`, visitorData);
+    return response.data;
+  } catch (error) {
+    console.error("Error adding visitor:", error);
+    throw error.response ? error.response.data : error;
+  }
+};
+
+export const loginVisitor = async (data) => {
+  try {
+    const response = await axios.post(`${API_URL}api/login/`, data);
+    return response.data;
+  } catch (error) {
+    return { success: false, message: error.response?.data?.message || 'Login failed' };
+  }
+};
+
+export const eventLog = async (data) => {
+  try {
+    const response = await axios.post(`${API_URL}api/event/`, data);
+    return response.data;
+  } catch (error) {
+    return { success: false, message: error.response?.data?.message || 'No log' };
+  }
+};

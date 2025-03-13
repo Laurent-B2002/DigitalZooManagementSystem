@@ -3,6 +3,8 @@ from rest_framework.exceptions import ValidationError
 from django.http import JsonResponse
 from .models import Animal, Habitat, Zookeeper, Task, Membership, Visitor, Event, EventFeedback
 from rest_framework import viewsets
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 from .serializers import HabitatSerializer, AnimalSerializer, ZookeeperSerializer, TaskSerializer, MembershipSerializer, VisitorSerializer, EventSerializer, EventFeedbackSerializer
 from django.core.mail import send_mail
 from django.conf import settings
@@ -467,3 +469,15 @@ def add_event(request):
         }, status=201)
     except Exception as e:
         return JsonResponse({"error": f"An error occurred: {e}"}, status=500)
+    
+
+@api_view(['POST'])
+def login_visitor(request):
+    name = request.data.get('name')
+    password = request.data.get('password')
+
+    try:
+        visitor = Visitor.objects.get(name=name, password=password)
+        return Response({'success': True, 'message': 'Login successful'})
+    except Visitor.DoesNotExist:
+        return Response({'success': False, 'message': 'Invalid name or password'}, status=400)

@@ -30,5 +30,7 @@ urlpatterns = [
     path('zookeepers/delete/', views.delete_zookeeper, name='delete_zookeeper'),
     path('zookeepers/update/', views.update_zookeeper, name='update_zookeeper'),
     path('events/add/', views.add_event, name='add_event'),
+
+    path('api/login/', views.login_visitor, name='login_visitor'),
 ]
 

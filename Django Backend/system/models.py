@@ -88,16 +88,13 @@ class Membership(models.Model):
     def __str__(self):
         return f"{self.role}"
     
-class Visitor(AbstractBaseUser):
+class Visitor(models.Model):
     name = models.CharField(max_length=100, unique=True)
     email = models.EmailField(unique=True)
+    password = models.CharField(max_length=200)
     membership = models.ForeignKey(Membership, on_delete=models.SET_NULL, null=True, blank=True)
     membership_start = models.DateField(null=True, blank=True)
     membership_end = models.DateField(null=True, blank=True)
-    is_active = models.BooleanField(default=True)
-
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['name']
 
     def renew(self):
         if self.membership:
