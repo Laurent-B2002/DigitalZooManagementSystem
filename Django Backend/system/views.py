@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404
+from django.contrib.auth.decorators import login_required
 from rest_framework.exceptions import ValidationError
 from django.http import JsonResponse
 from .models import Animal, Habitat, Zookeeper, Task, Membership, Visitor, Event, EventFeedback
@@ -481,3 +482,33 @@ def login_visitor(request):
         return Response({'success': True, 'message': 'Login successful'})
     except Visitor.DoesNotExist:
         return Response({'success': False, 'message': 'Invalid name or password'}, status=400)
+
+def get_visitor_and_events(request):
+    visitor_name = request.GET.get('name')
+    if not visitor_name:
+        return JsonResponse({'success': False, 'message': 'Name is required'}, status=400)
+
+    visitor = get_object_or_404(Visitor, name=visitor_name)
+    membership = visitor.membership
+    
+    if not membership:
+        return JsonResponse({'success': False, 'message': 'No membership associated with this visitor'}, status=400)
+
+    membership_role = membership.role
+    
+    if membership_role == 'L1':
+        events = Event.objects.filter(memberships__role='L1')
+    elif membership_role == 'L2':
+        events = Event.objects.filter(memberships__role__in=['L1', 'L2'])
+    elif membership_role == 'L3':
+        events = Event.objects.filter(memberships__role__in=['L1', 'L2', 'L3'])
+    else:
+        events = Event.objects.none()
+
+    event_list = [{'id': event.id, 'name': event.name, 'time': event.time} for event in events]
+
+    return JsonResponse({
+        'success': True,
+        'membership': membership.role,
+        'events': event_list
+    })

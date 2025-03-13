@@ -32,5 +32,6 @@ urlpatterns = [
     path('events/add/', views.add_event, name='add_event'),
 
     path('api/login/', views.login_visitor, name='login_visitor'),
+    path('api/visitor-events/', views.get_visitor_and_events, name='get_visitor_and_events'),
 ]
 
