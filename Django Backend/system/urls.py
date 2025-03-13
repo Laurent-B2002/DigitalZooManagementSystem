@@ -33,5 +33,6 @@ urlpatterns = [
 
     path('api/login/', views.login_visitor, name='login_visitor'),
     path('api/visitor-events/', views.get_visitor_and_events, name='get_visitor_and_events'),
+    path('update-membership/<str:visitor_name>/', views.update_visitor_membership),
 ]
 

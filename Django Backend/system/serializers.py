@@ -35,7 +35,7 @@ class VisitorSerializer(serializers.ModelSerializer):
     )
     class Meta:
         model = Visitor
-        fields = '__all__'
+        fields = ['id', 'name', 'membership', 'membership_start', 'membership_end']
 
 class EventSerializer(serializers.ModelSerializer):
     class Meta:

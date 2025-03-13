@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from rest_framework.exceptions import ValidationError
 from django.http import JsonResponse
 from .models import Animal, Habitat, Zookeeper, Task, Membership, Visitor, Event, EventFeedback
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .serializers import HabitatSerializer, AnimalSerializer, ZookeeperSerializer, TaskSerializer, MembershipSerializer, VisitorSerializer, EventSerializer, EventFeedbackSerializer
@@ -509,6 +509,34 @@ def get_visitor_and_events(request):
 
     return JsonResponse({
         'success': True,
+        'name': visitor.name,
         'membership': membership.role,
         'events': event_list
     })
+
+#renew
+@api_view(['PUT'])
+def update_visitor_membership(request, visitor_name):
+    try:
+        visitor = Visitor.objects.get(name=visitor_name)
+    except Visitor.DoesNotExist:
+        return Response({'error': 'Visitor not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    role = request.data.get('membership_id')
+    start_date = request.data.get('membership_start_date')
+    end_date = request.data.get('membership_end_date')
+
+    if role and start_date and end_date:
+        try:
+            membership = Membership.objects.get(role=role)
+        except Membership.DoesNotExist:
+            return Response({'error': 'Membership role not found'}, status=status.HTTP_400_BAD_REQUEST)
+
+        visitor.membership = membership
+        visitor.membership_start = start_date
+        visitor.membership_end = end_date
+        visitor.save()
+
+        return Response({'message': 'Membership updated successfully'}, status=status.HTTP_200_OK)
+    else:
+        return Response({'error': 'Invalid data'}, status=status.HTTP_400_BAD_REQUEST)
