@@ -565,6 +565,7 @@ def create_tour_with_route(request):
     }
     
     route_data = request.data.get('route', [])
+    start_time_str = request.data.get('start_time')
     
     if not tour_data['name'] or not tour_data['description'] or not tour_data['duration']:
         return Response(
@@ -578,10 +579,24 @@ def create_tour_with_route(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     
+    if not start_time_str:
+        return Response(
+            {"error": "Start time is required"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    try:
+        start_time = datetime.strptime(start_time_str, "%Y-%m-%d %H:%M")
+    except ValueError:
+        return Response(
+            {"error": "Invalid start_time format. Use 'YYYY-MM-DD HH:mm' format"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
     try:
         tour_serializer = TourSerializer(data=tour_data)
         if tour_serializer.is_valid():
-            tour = tour_serializer.save()
+            tour = tour_serializer.save(start_time=start_time)
             
             for route_item in route_data:
                 habitat_id = route_item.get('habitat')
@@ -611,12 +626,13 @@ def create_tour_with_route(request):
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
 
+
 @api_view(['POST'])
 def schedule_tour(request):
     tour_id = request.data.get('tour_id')
-    start_time = request.data.get('start_time')
+    start_time_str = request.data.get('start_time')
     
-    if not tour_id or not start_time:
+    if not tour_id or not start_time_str:
         return Response(
             {"error": "Both tour_id and start_time are required"},
             status=status.HTTP_400_BAD_REQUEST
@@ -631,13 +647,13 @@ def schedule_tour(request):
         )
     
     try:
-        start_time = datetime.fromisoformat(start_time.replace('Z', '+00:00'))
+        start_time = datetime.strptime(start_time_str, "%Y-%m-%d %H:%M")
     except ValueError:
         return Response(
-            {"error": "Invalid start_time format. Use ISO format (e.g., '2023-01-01T10:00:00')"},
+            {"error": "Invalid start_time format. Use 'YYYY-MM-DD HH:mm' format"},
             status=status.HTTP_400_BAD_REQUEST
         )
-    
+
     success, message = Tour.schedule_tour(tour_id, start_time)
     
     if success:
