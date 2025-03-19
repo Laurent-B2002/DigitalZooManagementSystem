@@ -35,7 +35,7 @@ class VisitorSerializer(serializers.ModelSerializer):
     )
     class Meta:
         model = Visitor
-        fields = ['id', 'name', 'membership', 'membership_start', 'membership_end']
+        fields = ['id', 'name', 'email', 'password', 'membership', 'membership_start', 'membership_end']
 
 class EventSerializer(serializers.ModelSerializer):
     class Meta:
