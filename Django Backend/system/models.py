@@ -132,5 +132,36 @@ class EventFeedback(models.Model):
 
     def __str__(self):
         return f"Feedback for {self.event.name} by {self.visitor.name} - {self.rating} Stars"
+
+# Tour  
+class Route(models.Model):
+    habitat = models.ForeignKey(Habitat, on_delete=models.CASCADE)
+    time = models.TimeField()
+    order = models.PositiveIntegerField()
+
+    class Meta:
+        ordering = ['order']
+
+    def __str__(self):
+        return f"{self.order}: {self.habitat.name} - time: {self.time}"
+
+class Tour(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    max_visitors = models.PositiveIntegerField(default=20)
+    routes = models.ManyToManyField(Route, related_name="tours")
+
+    def get_habitats(self):
+        return Habitat.objects.filter(route__in=self.routes.all()).distinct()
     
-    
+    def get_animals(self):
+        habitats = self.get_habitats()
+        return Animal.objects.filter(habitat__in=habitats).distinct()
+
+class TourFeedback(models.Model):
+    tour = models.ForeignKey(Tour, on_delete=models.CASCADE)
+    visitor = models.ForeignKey(Visitor, on_delete=models.CASCADE)
+    rating = models.IntegerField(choices=[(i, i) for i in range(1, 6)])
+    comment = models.TextField()
+
+    def __str__(self):
+        return f"Feedback for {self.tour.name} by {self.visitor.name} - {self.rating} Stars"
