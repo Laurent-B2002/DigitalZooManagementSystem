@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { loginVisitor } from '../services/api';
+import { loginVisitor, getVisitorAndEvents } from '../services/api';
 
-function Login({ setIsAuthenticated }) {
+function Login({ setIsAuthenticated, setVisitorData }) {
   const [formData, setFormData] = useState({ name: '', password: '' });
   const [error, setError] = useState(null);
   const navigate = useNavigate();
@@ -19,7 +19,14 @@ function Login({ setIsAuthenticated }) {
       const response = await loginVisitor(formData);
       if (response.success) {
         setIsAuthenticated(true);
-        navigate('/eventlog');
+  
+        const visitorEvents = await getVisitorAndEvents(formData.name);
+        if (visitorEvents.success) {
+          setVisitorData(visitorEvents);
+          navigate('/eventlog');
+        } else {
+          setError(visitorEvents.message);
+        }
       } else {
         setError('Invalid name or password');
       }

@@ -9,6 +9,7 @@ import './App.css';
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [visitorData, setVisitorData] = useState(null);
 
   const PrivateRoute = ({ element }) => {
     return isAuthenticated ? element : <Navigate to="/" />;
@@ -18,21 +19,20 @@ const App = () => {
     <Router>
       <div>
         <header>
-          <nav>
-            <Link to="/">Login</Link>
-            <Link to="/register">Register</Link>
-            <Link to="/zooManager">Zoo Manager</Link>
-            <Link to="/eventlog">Event Log</Link>
+          <nav style={{ display: "flex", gap: "10px", padding: "8px", backgroundColor: "#333" }}>
+            <Link to="/" style={{ padding: "8px 20px", backgroundColor: "#333", color: "white", borderRadius: "5px", textDecoration: "none" }}>Login</Link>
+            <Link to="/register" style={{ padding: "8px 20px", backgroundColor: "#333", color: "white", borderRadius: "5px", textDecoration: "none" }}>Register</Link>
+            <Link to="/zooManager" style={{ padding: "8px 20px", backgroundColor: "#333", color: "white", borderRadius: "5px", textDecoration: "none" }}>Zoo Manager</Link>
+            <Link to="/eventlog" style={{ padding: "8px 20px", backgroundColor: "#333", color: "white", borderRadius: "5px", textDecoration: "none" }}>Event Log</Link>
           </nav>
         </header>
 
         <main>
           <Routes>
-            <Route path="/" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
+            <Route path="/" element={<Login setIsAuthenticated={setIsAuthenticated} setVisitorData={setVisitorData} />} />
             <Route path="/register" element={<AddVisitorForm />} />
             <Route path="/zooManager" element={<ZooManager />} />
-
-            <Route path="/eventlog" element={<PrivateRoute element={<EventLog />} />} />
+            <Route path="/eventlog" element={<PrivateRoute element={<EventLog visitorData={visitorData} />} />} />
           </Routes>
         </main>
       </div>

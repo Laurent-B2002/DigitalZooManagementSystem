@@ -338,3 +338,14 @@ export const eventLog = async (data) => {
     return { success: false, message: error.response?.data?.message || 'No log' };
   }
 };
+
+export const getVisitorAndEvents = async (name) => {
+  try {
+    const response = await axios.get(`${API_URL}api/visitor-events/`, {
+      params: { name }
+    });
+    return response.data;
+  } catch (error) {
+    return { success: false, message: error.response?.data?.message || 'Failed to fetch events' };
+  }
+};
