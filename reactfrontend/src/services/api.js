@@ -349,3 +349,107 @@ export const getVisitorAndEvents = async (name) => {
     return { success: false, message: error.response?.data?.message || 'Failed to fetch events' };
   }
 };
+
+export const getTours = async () => {
+  try {
+    const response = await axios.get(`${API_URL}api/tour/`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching tours:', error);
+    throw error.response ? error.response.data : error;
+  }
+};
+
+export const getTourById = async (tourId) => {
+  try {
+    const response = await axios.get(`${API_URL}api/tour/${tourId}/`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching tour details:', error);
+    throw error.response ? error.response.data : error;
+  }
+};
+
+export const createTourWithRoute = async (tourData) => {
+  try {
+    const response = await axios.post(`${API_URL}create-tour-with-route/`, tourData);
+    return response.data;
+  } catch (error) {
+    console.error('Error creating tour:', error);
+    throw error.response ? error.response.data : error;
+  }
+};
+
+export const scheduleTour = async (tourId, startTime) => {
+  try {
+    const response = await axios.post(`${API_URL}schedule-tour/`, {
+      tour_id: tourId,
+      start_time: startTime
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error scheduling tour:', error);
+    throw error.response ? error.response.data : error;
+  }
+};
+
+export const updateTour = async (tourId, tourData) => {
+  try {
+    const response = await axios.put(`${API_URL}api/tour/${tourId}/`, tourData);
+    return response.data;
+  } catch (error) {
+    console.error('Error updating tour:', error);
+    throw error.response ? error.response.data : error;
+  }
+};
+
+export const deleteTour = async (tourId) => {
+  try {
+    await axios.delete(`${API_URL}api/tour/${tourId}/`);
+    return { message: `Tour with ID ${tourId} deleted successfully!` };
+  } catch (error) {
+    console.error('Error deleting tour:', error);
+    throw error.response ? error.response.data : error;
+  }
+};
+
+export const getTourRoutes = async () => {
+  try {
+    const response = await axios.get(`${API_URL}api/tourroute/`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching tour routes:', error);
+    throw error.response ? error.response.data : error;
+  }
+};
+
+export const addTourFeedback = async (feedbackData) => {
+  try {
+    const response = await axios.post(`${API_URL}add-tour-feedback/`, feedbackData);
+    return response.data;
+  } catch (error) {
+    console.error('Error submitting tour feedback:', error);
+    throw error.response ? error.response.data : error;
+  }
+};
+
+export const getTourFeedback = async () => {
+  try {
+    const response = await axios.get(`${API_URL}api/tourfeedback/`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching tour feedback:', error);
+    throw error.response ? error.response.data : error;
+  }
+};
+
+export const getTourFeedbackByTour = async (tourId) => {
+  try {
+    const response = await axios.get(`${API_URL}api/tourfeedback/?tour=${tourId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching tour feedback:', error);
+    throw error.response ? error.response.data : error;
+  }
+};
+
