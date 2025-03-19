@@ -664,11 +664,11 @@ def schedule_tour(request):
 @api_view(['POST'])
 def add_tour_feedback(request):
     tour_id = request.data.get('tour_id')
-    visitor_id = request.data.get('visitor_id')
+    visitor_name = request.data.get('visitor_name')
     rating = request.data.get('rating')
     comment = request.data.get('comment', '')
     
-    if not tour_id or not visitor_id or not rating:
+    if not tour_id or not visitor_name or not rating:
         return Response(
             {"error": "tour_id, visitor_id, and rating are required"},
             status=status.HTTP_400_BAD_REQUEST
@@ -676,7 +676,7 @@ def add_tour_feedback(request):
     
     try:
         tour = Tour.objects.get(id=tour_id)
-        visitor = Visitor.objects.get(id=visitor_id)
+        visitor = Visitor.objects.get(name=visitor_name)
         
         feedback = TourFeedback.objects.create(
             tour=tour,
@@ -697,7 +697,7 @@ def add_tour_feedback(request):
         )
     except Visitor.DoesNotExist:
         return Response(
-            {"error": f"Visitor with ID {visitor_id} not found"},
+            {"error": f"Visitor with ID {visitor_name} not found"},
             status=status.HTTP_404_NOT_FOUND
         )
     except Exception as e:
