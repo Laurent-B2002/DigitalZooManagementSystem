@@ -1,14 +1,16 @@
 from django.shortcuts import get_object_or_404
+from django.core.exceptions import ValidationError
 from django.contrib.auth.decorators import login_required
 from rest_framework.exceptions import ValidationError
 from django.http import JsonResponse
-from .models import Animal, Habitat, Zookeeper, Task, Membership, Visitor, Event, EventFeedback
+from .models import Animal, Habitat, Zookeeper, Task, Membership, Visitor, Event, EventFeedback, TourFeedback, Tour, TourRoute
 from rest_framework import viewsets, status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .serializers import HabitatSerializer, AnimalSerializer, ZookeeperSerializer, TaskSerializer, MembershipSerializer, VisitorSerializer, EventSerializer, EventFeedbackSerializer
+from .serializers import HabitatSerializer, AnimalSerializer, ZookeeperSerializer, TaskSerializer, MembershipSerializer, VisitorSerializer, EventSerializer, EventFeedbackSerializer, TourSerializer, TourRouteSerializer, TourFeedbackSerializer
 from django.core.mail import send_mail
 from django.conf import settings
+from datetime import datetime
 
 class HabitatViewSet(viewsets.ModelViewSet):
     queryset = Habitat.objects.all()
@@ -68,6 +70,18 @@ class EventViewSet(viewsets.ModelViewSet):
 class EventFeedbackViewSet(viewsets.ModelViewSet):
     queryset = EventFeedback.objects.all()
     serializer_class = EventFeedbackSerializer
+
+class TourViewSet(viewsets.ModelViewSet):
+    queryset = Tour.objects.all()
+    serializer_class = TourSerializer
+
+class TourRouteViewSet(viewsets.ModelViewSet):
+    queryset = TourRoute.objects.all()
+    serializer_class = TourRouteSerializer
+
+class TourFeedbackViewSet(viewsets.ModelViewSet):
+    queryset = TourFeedback.objects.all()
+    serializer_class = TourFeedbackSerializer
 
 def get_habitats(request):
     habitats = Habitat.objects.all()
@@ -540,3 +554,139 @@ def update_visitor_membership(request, visitor_name):
         return Response({'message': 'Membership updated successfully'}, status=status.HTTP_200_OK)
     else:
         return Response({'error': 'Invalid data'}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def create_tour_with_route(request):
+    tour_data = {
+        'name': request.data.get('name'),
+        'description': request.data.get('description'),
+        'duration': request.data.get('duration'),
+        'available_spots': request.data.get('available_spots', 20)
+    }
+    
+    route_data = request.data.get('route', [])
+    
+    if not tour_data['name'] or not tour_data['description'] or not tour_data['duration']:
+        return Response(
+            {"error": "Name, description, and duration are required for the tour"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    if not route_data:
+        return Response(
+            {"error": "Route is required with at least one habitat"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        tour_serializer = TourSerializer(data=tour_data)
+        if tour_serializer.is_valid():
+            tour = tour_serializer.save()
+            
+            for route_item in route_data:
+                habitat_id = route_item.get('habitat')
+                order = route_item.get('order')
+                
+                TourRoute.objects.create(
+                    tour=tour,
+                    habitat_id=habitat_id,
+                    order=order
+                )
+
+            tour_with_details = Tour.objects.get(id=tour.id)
+            return Response(
+                {
+                    "tour": TourSerializer(tour_with_details).data,
+                    "animals": [{"id": animal.id, "species": animal.species} for animal in tour.get_animals()]
+                },
+                status=status.HTTP_201_CREATED
+            )
+        return Response(
+            tour_serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    except Exception as e:
+        return Response(
+            {"error": f"An error occurred: {str(e)}"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+@api_view(['POST'])
+def schedule_tour(request):
+    tour_id = request.data.get('tour_id')
+    start_time = request.data.get('start_time')
+    
+    if not tour_id or not start_time:
+        return Response(
+            {"error": "Both tour_id and start_time are required"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        tour = Tour.objects.get(id=tour_id)
+    except Tour.DoesNotExist:
+        return Response(
+            {"error": f"Tour with ID {tour_id} not found"},
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    try:
+        start_time = datetime.fromisoformat(start_time.replace('Z', '+00:00'))
+    except ValueError:
+        return Response(
+            {"error": "Invalid start_time format. Use ISO format (e.g., '2023-01-01T10:00:00')"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    success, message = Tour.schedule_tour(tour_id, start_time)
+    
+    if success:
+        return Response({"message": message}, status=status.HTTP_200_OK)
+    else:
+        return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def add_tour_feedback(request):
+    tour_id = request.data.get('tour_id')
+    visitor_id = request.data.get('visitor_id')
+    rating = request.data.get('rating')
+    comment = request.data.get('comment', '')
+    
+    if not tour_id or not visitor_id or not rating:
+        return Response(
+            {"error": "tour_id, visitor_id, and rating are required"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        tour = Tour.objects.get(id=tour_id)
+        visitor = Visitor.objects.get(id=visitor_id)
+        
+        feedback = TourFeedback.objects.create(
+            tour=tour,
+            visitor=visitor,
+            rating=rating,
+            comment=comment
+        )
+        
+        return Response({
+            "message": "Feedback submitted successfully",
+            "feedback": TourFeedbackSerializer(feedback).data
+        }, status=status.HTTP_201_CREATED)
+    
+    except Tour.DoesNotExist:
+        return Response(
+            {"error": f"Tour with ID {tour_id} not found"},
+            status=status.HTTP_404_NOT_FOUND
+        )
+    except Visitor.DoesNotExist:
+        return Response(
+            {"error": f"Visitor with ID {visitor_id} not found"},
+            status=status.HTTP_404_NOT_FOUND
+        )
+    except Exception as e:
+        return Response(
+            {"error": f"An error occurred: {str(e)}"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+

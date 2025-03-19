@@ -1,7 +1,7 @@
 from django.urls import path, include
 from . import views
 from rest_framework.routers import DefaultRouter
-from .views import HabitatViewSet, AnimalViewSet, ZookeeperViewSet, TaskViewSet, MembershipViewSet, VisitorViewSet, EventViewSet, EventFeedbackViewSet
+from .views import HabitatViewSet, AnimalViewSet, ZookeeperViewSet, TaskViewSet, MembershipViewSet, VisitorViewSet, EventViewSet, EventFeedbackViewSet, TourViewSet, TourRouteViewSet, TourFeedbackViewSet
 
 
 
@@ -14,6 +14,10 @@ router.register(r'membership', MembershipViewSet)
 router.register(r'visitor', VisitorViewSet)
 router.register(r'event', EventViewSet)
 router.register(r'eventfeedback', EventFeedbackViewSet)
+router.register(r'tour', TourViewSet)
+router.register(r'tourroute', TourRouteViewSet)
+router.register(r'tourfeedback', TourFeedbackViewSet)
+
 
 urlpatterns = [
     path('api/', include(router.urls)),
@@ -30,6 +34,10 @@ urlpatterns = [
     path('zookeepers/delete/', views.delete_zookeeper, name='delete_zookeeper'),
     path('zookeepers/update/', views.update_zookeeper, name='update_zookeeper'),
     path('events/add/', views.add_event, name='add_event'),
+    path('create-tour-with-route/', views.create_tour_with_route, name='create-tour-with-route'),
+    path('schedule-tour/', views.schedule_tour, name='schedule-tour'),
+    path('add-tour-feedback/', views.add_tour_feedback, name='add-tour-feedback'),
+
 
     path('api/login/', views.login_visitor, name='login_visitor'),
     path('api/visitor-events/', views.get_visitor_and_events, name='get_visitor_and_events'),

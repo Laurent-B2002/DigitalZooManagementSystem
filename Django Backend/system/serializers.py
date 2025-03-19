@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Habitat, Animal, Zookeeper, Task, Membership, Visitor, Event, EventFeedback
+from .models import Habitat, Animal, Zookeeper, Task, Membership, Visitor, Event, EventFeedback, Tour, TourRoute, TourFeedback
 
 class HabitatSerializer(serializers.ModelSerializer):
     class Meta:
@@ -48,3 +48,30 @@ class EventFeedbackSerializer(serializers.ModelSerializer):
     class Meta:
         model = EventFeedback
         fields = '__all__'
+
+class TourRouteSerializer(serializers.ModelSerializer):
+    habitat_name = serializers.CharField(source='habitat.name', read_only=True)
+    
+    class Meta:
+        model = TourRoute
+        fields = ['id', 'habitat', 'habitat_name', 'order']
+
+class TourSerializer(serializers.ModelSerializer):
+    route_details = TourRouteSerializer(source='tourroute_set', many=True, read_only=True)
+    animals = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Tour
+        fields = ['id', 'name', 'description', 'duration', 'start_time', 'available_spots', 'is_scheduled', 'route_details', 'animals']
+
+    def get_animals(self, obj):
+        animals = obj.get_animals()
+        return [{"id": animal.id, "species": animal.species} for animal in animals]
+
+class TourFeedbackSerializer(serializers.ModelSerializer):
+    visitor_name = serializers.CharField(source='visitor.name', read_only=True)
+    
+    class Meta:
+        model = TourFeedback
+        fields = ['id', 'tour', 'visitor', 'visitor_name', 'rating', 'comment']
+
