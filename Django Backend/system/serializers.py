@@ -57,7 +57,7 @@ class TourRouteSerializer(serializers.ModelSerializer):
         fields = ['id', 'habitat', 'habitat_name', 'order']
 
 class TourSerializer(serializers.ModelSerializer):
-    route_details = TourRouteSerializer(source='tourroute_set', many=True, read_only=True)
+    route_details = TourRouteSerializer(source='tourroute_set.all', many=True, read_only=True)
     animals = serializers.SerializerMethodField()
     
     class Meta:

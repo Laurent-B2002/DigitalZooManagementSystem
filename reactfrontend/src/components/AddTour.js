@@ -16,6 +16,7 @@ const AddTour = () => {
   }]);
 
   const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
   const handleTourChange = (e) => {
     const { name, value } = e.target;
@@ -60,7 +61,6 @@ const AddTour = () => {
         return;
       }
 
-    // 如果 start_time 中包含 'T'，将其替换为空格
     const formattedStartTime = tourData.start_time.replace('T', ' ');
 
     if (hasDuplicateHabitats()) {
@@ -73,12 +73,13 @@ const AddTour = () => {
     try {
       const tourPayload = {
         ...tourData,
-        start_time: formattedStartTime,  // 使用格式化后的时间
+        start_time: formattedStartTime,
         route: routeData,
       };
 
       const response = await createTourWithRoute(tourPayload);
       console.log('Tour Created:', response);
+      setSuccessMessage('Tour created successfully!');
     } catch (error) {
       console.error('Error creating tour:', error);
       setErrorMessage('There was an error creating the tour.');
@@ -229,6 +230,7 @@ const AddTour = () => {
         </div>
       </form>
 
+      {successMessage && <p style={{ color: 'green', textAlign: 'center' }}>{successMessage}</p>}
       {errorMessage && <p style={{ color: 'red', textAlign: 'center' }}>{errorMessage}</p>}
     </div>
   );

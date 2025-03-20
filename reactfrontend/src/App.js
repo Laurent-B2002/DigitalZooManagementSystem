@@ -5,6 +5,7 @@ import EventLog from './components/EventLog';
 import Feedback from './components/Feedback';
 import AddVisitorForm from './components/AddVisitorForm';
 import ZooManager from './components/ZooManager';
+import AddTour from './components/AddTour';
 
 import './App.css';
 
@@ -25,6 +26,7 @@ const App = () => {
             <Link to="/register" style={{ padding: "8px 20px", backgroundColor: "#333", color: "white", borderRadius: "5px", textDecoration: "none" }}>Register</Link>
             <Link to="/zooManager" style={{ padding: "8px 20px", backgroundColor: "#333", color: "white", borderRadius: "5px", textDecoration: "none" }}>Zoo Manager</Link>
             <Link to="/eventlog" style={{ padding: "8px 20px", backgroundColor: "#333", color: "white", borderRadius: "5px", textDecoration: "none" }}>Event Log</Link>
+            <Link to="/addtour" style={{ padding: "8px 20px", backgroundColor: "#333", color: "white", borderRadius: "5px", textDecoration: "none" }}>Add Tour</Link>
             <Link to="/feedback" style={{ padding: "8px 20px", backgroundColor: "#333", color: "white", borderRadius: "5px", textDecoration: "none" }}>Feedback</Link>
           </nav>
         </header>
@@ -35,7 +37,9 @@ const App = () => {
             <Route path="/register" element={<AddVisitorForm />} />
             <Route path="/zooManager" element={<ZooManager />} />
             <Route path="/eventlog" element={<PrivateRoute element={<EventLog visitorData={visitorData} />} />} />
+            <Route path="/addtour" element={<PrivateRoute element={<AddTour visitorData={visitorData} />} />} />
             <Route path="/feedback" element={<PrivateRoute element={<Feedback visitorData={visitorData} />} />} />
+            
           </Routes>
         </main>
       </div>

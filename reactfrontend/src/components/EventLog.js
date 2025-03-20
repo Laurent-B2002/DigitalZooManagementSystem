@@ -44,19 +44,6 @@ function EventLog({ visitorData }) {
           ) : (
             <p style={{ color: '#ff6347', fontSize: '16px' }}>No events available</p>
           )}
-          
-          <button
-            style={{
-              padding: '10px 20px',
-              backgroundColor: 'skyblue',
-              color: 'white',
-              border: 'none',
-              borderRadius: '5px',
-            }}
-            onClick={handleAddTourClick}
-          >
-            Add New Tour
-          </button>
 
           <RenewMembership visitorData={visitorData} />
         </>

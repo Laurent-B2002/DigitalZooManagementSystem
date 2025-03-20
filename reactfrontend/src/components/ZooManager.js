@@ -4,6 +4,7 @@ import { HabitatList } from './HabitatList';
 import ZookeeperList from './ZookeeperList';
 import TaskList from './TaskList';
 import EventList from './EventList';
+import TourList from './TourList';
 import FeedbackList from './FeedbackList';
 
 import AddAnimalForm from './AddAnimalForm';
@@ -68,6 +69,12 @@ function ZooManager() {
             onClick={() => setActiveTab('viewEvents')}
           >
             View Events
+          </button>
+          <button 
+            className={activeTab === 'viewTours' ? 'active' : ''} 
+            onClick={() => setActiveTab('viewTours')}
+          >
+            View Tours
           </button>
           <button 
             className={activeTab === 'viewFeedback' ? 'active' : ''} 
@@ -187,6 +194,7 @@ function ZooManager() {
         {activeTab === 'viewZookeepers' && <ZookeeperList key={`zookeepers-${refreshKey}`} />}
         {activeTab === 'viewTasks' && <TaskList key={`tasks-${refreshKey}`} />}
         {activeTab === 'viewEvents' && <EventList key={`events-${refreshKey}`} />}
+        {activeTab === 'viewTours' && <TourList key={`events-${refreshKey}`} />}
         {activeTab === 'viewFeedback' && <FeedbackList key={`feedback-${refreshKey}`} />}
 
         {/* Add Components */}
