@@ -76,7 +76,7 @@ const FeedbackList = () => {
                     <ul>
                         {feedbackList.map((feedback) => (
                             <li key={feedback.id}>
-                                <p><strong>Rating:</strong> {feedback.rating}</p>
+                                <p><strong>Rating:</strong> {feedback.rating} <label>/ 5</label></p>
                                 <p><strong>Comment:</strong> {feedback.comment}</p>
                                 <p><strong>Visitor:</strong> {feedback.visitor_name}</p>
                             </li>
