@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
 from dateutil.relativedelta import relativedelta
 from datetime import datetime
+from django.db.models import Q, F, ExpressionWrapper, DurationField
 
 class Habitat(models.Model):
     name = models.CharField(max_length=50, unique=True)
@@ -151,23 +152,29 @@ class Tour(models.Model):
     @classmethod
     def schedule_tour(cls, tour_id, start_time):
         tour = cls.objects.get(id=tour_id)
-        end_time = start_time + tour.duration
-        
+        end_time = start_time + tour.duration 
+
         for habitat in tour.route.all():
             conflicting_tours = Tour.objects.filter(
                 route=habitat,
-                start_time__lt=end_time,
-                start_time__gt=start_time,
                 is_scheduled=True
+            ).annotate(
+                end_time=ExpressionWrapper(F('start_time') + F('duration'), output_field=DurationField())
+            ).filter(
+                Q(start_time__lt=end_time, end_time__gt=start_time)  
             ).exclude(id=tour_id)
-            
+
             if conflicting_tours.exists():
-                return False, f"Habitat {habitat.name} is already booked for another tour during this time slot."
-        
+                return False, f"Scheduling conflict! Habitat '{habitat.name}' is already booked for another tour in this time slot."
+
         tour.start_time = start_time
         tour.is_scheduled = True
         tour.save()
         return True, "Tour scheduled successfully!"
+
+
+
+
 
 class TourRoute(models.Model):
     tour = models.ForeignKey(Tour, on_delete=models.CASCADE)

@@ -631,35 +631,29 @@ def create_tour_with_route(request):
 def schedule_tour(request):
     tour_id = request.data.get('tour_id')
     start_time_str = request.data.get('start_time')
-    
+
     if not tour_id or not start_time_str:
-        return Response(
-            {"error": "Both tour_id and start_time are required"},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    
+        return Response({"error": "Both tour_id and start_time are required"}, status=status.HTTP_400_BAD_REQUEST)
+
     try:
         tour = Tour.objects.get(id=tour_id)
     except Tour.DoesNotExist:
-        return Response(
-            {"error": f"Tour with ID {tour_id} not found"},
-            status=status.HTTP_404_NOT_FOUND
-        )
-    
+        return Response({"error": f"Tour with ID {tour_id} not found"}, status=status.HTTP_404_NOT_FOUND)
+
     try:
         start_time = datetime.strptime(start_time_str, "%Y-%m-%d %H:%M")
     except ValueError:
-        return Response(
-            {"error": "Invalid start_time format. Use 'YYYY-MM-DD HH:mm' format"},
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        return Response({"error": "Invalid start_time format. Use 'YYYY-MM-DD HH:mm' format"}, status=status.HTTP_400_BAD_REQUEST)
 
     success, message = Tour.schedule_tour(tour_id, start_time)
-    
+
     if success:
-        return Response({"message": message}, status=status.HTTP_200_OK)
+        return Response({"message": message, "scheduled_time": start_time}, status=status.HTTP_200_OK)
     else:
         return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
 
 @api_view(['POST'])
 def add_tour_feedback(request):

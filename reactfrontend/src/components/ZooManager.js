@@ -5,24 +5,28 @@ import ZookeeperList from './ZookeeperList';
 import TaskList from './TaskList';
 import EventList from './EventList';
 import FeedbackList from './FeedbackList';
+import TourList from './TourList';
 
 import AddAnimalForm from './AddAnimalForm';
 import AddHabitatForm from './AddHabitatForm';
 import AddZookeeperForm from './AddZookeeperForm';
 import AddTaskForm from './AddTaskForm';
 import AddEventForm from './AddEventForm';
+import AddTour from './AddTour';
 
 import UpdateAnimalForm from './UpdateAnimalForm';
 import UpdateHabitatForm from './UpdateHabitatForm';
 import UpdateZookeeperForm from './UpdateZookeeperForm';
 import UpdateTaskForm from './UpdateTaskForm';
 import UpdateEventForm from './UpdateEventForm';
+import UpdateTourForm from './UpdateTourForm';
 
 import { DeleteAnimalForm } from './DeleteAnimalForm';
 import { DeleteHabitatForm } from './DeleteHabitatForm';
 import { DeleteZookeeperForm } from './DeleteZookeeperForm';
-import DeleteTaskForm  from './DeleteTaskForm';
-import DeleteEventForm  from './DeleteEventForm';
+import DeleteTaskForm from './DeleteTaskForm';
+import DeleteEventForm from './DeleteEventForm';
+import DeleteTourForm from './DeleteTourForm';
 
 function ZooManager() {
   const [activeTab, setActiveTab] = useState('viewAnimals');
@@ -70,6 +74,12 @@ function ZooManager() {
             View Events
           </button>
           <button 
+            className={activeTab === 'viewTours' ? 'active' : ''} 
+            onClick={() => setActiveTab('viewTours')}
+          >
+            View Tours
+          </button>
+          <button 
             className={activeTab === 'viewFeedback' ? 'active' : ''} 
             onClick={() => setActiveTab('viewFeedback')}
           >
@@ -109,6 +119,12 @@ function ZooManager() {
           >
             Add Event
           </button>
+          <button 
+            className={activeTab === 'addTour' ? 'active' : ''} 
+            onClick={() => setActiveTab('addTour')}
+          >
+            Add Tour
+          </button>
         </div>
 
         <div className="tab-group">
@@ -142,6 +158,12 @@ function ZooManager() {
             onClick={() => setActiveTab('updateEvent')}
           >
             Update Event
+          </button>
+          <button 
+            className={activeTab === 'updateTour' ? 'active' : ''} 
+            onClick={() => setActiveTab('updateTour')}
+          >
+            Update Tour
           </button>
         </div>
 
@@ -177,6 +199,12 @@ function ZooManager() {
           >
             Delete Event
           </button>
+          <button 
+            className={activeTab === 'deleteTour' ? 'active' : ''} 
+            onClick={() => setActiveTab('deleteTour')}
+          >
+            Delete Tour
+          </button>
         </div>
       </div>
 
@@ -187,6 +215,7 @@ function ZooManager() {
         {activeTab === 'viewZookeepers' && <ZookeeperList key={`zookeepers-${refreshKey}`} />}
         {activeTab === 'viewTasks' && <TaskList key={`tasks-${refreshKey}`} />}
         {activeTab === 'viewEvents' && <EventList key={`events-${refreshKey}`} />}
+        {activeTab === 'viewTours' && <TourList key={`tours-${refreshKey}`} />}
         {activeTab === 'viewFeedback' && <FeedbackList key={`feedback-${refreshKey}`} />}
 
         {/* Add Components */}
@@ -220,6 +249,12 @@ function ZooManager() {
             alert("Event added successfully! View the updated list in the View Events tab.");
           }} />
         )}
+        {activeTab === 'addTour' && (
+          <AddTour onTourAdded={() => {
+            refreshData();
+            alert("Tour added successfully! View the updated list in the View Tours tab.");
+          }} />
+        )}
 
         {/* Update Components */}
         {activeTab === 'updateAnimal' && <UpdateAnimalForm onAnimalUpdated={refreshData} />}
@@ -227,6 +262,7 @@ function ZooManager() {
         {activeTab === 'updateZookeeper' && <UpdateZookeeperForm onZookeeperUpdated={refreshData} />}
         {activeTab === 'updateTask' && <UpdateTaskForm onTaskUpdated={refreshData} />}
         {activeTab === 'updateEvent' && <UpdateEventForm onEventUpdated={refreshData} />}
+        {activeTab === 'updateTour' && <UpdateTourForm onTourUpdated={refreshData} />}
 
         {/* Delete Components */}
         {activeTab === 'deleteAnimal' && <DeleteAnimalForm onAnimalDeleted={refreshData} />}
@@ -234,11 +270,11 @@ function ZooManager() {
         {activeTab === 'deleteZookeeper' && <DeleteZookeeperForm onZookeeperDeleted={refreshData} />}
         {activeTab === 'deleteTask' && <DeleteTaskForm onTaskDeleted={refreshData} />}
         {activeTab === 'deleteEvent' && <DeleteEventForm onEventDeleted={refreshData} />}
+        {activeTab === 'deleteTour' && <DeleteTourForm onTourDeleted={refreshData} />}
       </div>
     </div>
   );
 }
 
 export default ZooManager;
-
 

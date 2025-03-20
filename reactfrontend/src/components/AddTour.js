@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { createTourWithRoute } from '../services/api';
+import React, { useState, useEffect } from 'react';
+import { createTourWithRoute, getHabitats } from '../services/api';
 
-const AddTour = () => {
+const AddTour = ({ onTourAdded }) => {
   const [tourData, setTourData] = useState({
     name: '',
     description: '',
@@ -15,7 +15,27 @@ const AddTour = () => {
     order: 1
   }]);
 
+  const [availableHabitats, setAvailableHabitats] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchHabitats = async () => {
+      try {
+        setIsLoading(true);
+        const habitats = await getHabitats();
+        setAvailableHabitats(habitats);
+        setErrorMessage('');
+      } catch (error) {
+        console.error('Error fetching habitats:', error);
+        setErrorMessage('Failed to load habitats. Please try again.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchHabitats();
+  }, []);
 
   const handleTourChange = (e) => {
     const { name, value } = e.target;
@@ -25,10 +45,10 @@ const AddTour = () => {
     });
 
     if (name === 'start_time') {
-        const dateTime = new Date(value);
-        const isoDateWithoutTimezone = dateTime.toISOString().slice(0, 16);
-        setTourData({ ...tourData, start_time: isoDateWithoutTimezone });
-      }
+      const dateTime = new Date(value);
+      const isoDateWithoutTimezone = dateTime.toISOString().slice(0, 16);
+      setTourData({ ...tourData, start_time: isoDateWithoutTimezone });
+    }
   };
 
   const handleRouteChange = (index, e) => {
@@ -44,23 +64,26 @@ const AddTour = () => {
 
   const handleRemoveRoute = (index) => {
     const updatedRouteData = routeData.filter((_, i) => i !== index);
-    setRouteData(updatedRouteData);
+    const reorderedRoute = updatedRouteData.map((item, i) => ({
+      ...item,
+      order: i + 1
+    }));
+    setRouteData(reorderedRoute);
   };
 
   const hasDuplicateHabitats = () => {
     const habitats = routeData.map(route => route.habitat);
-    const uniqueHabitats = new Set(habitats);
-    return habitats.length !== uniqueHabitats.size;
+    const uniqueHabitats = new Set(habitats.filter(h => h !== ''));
+    return habitats.filter(h => h !== '').length !== uniqueHabitats.size;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!tourData.start_time) {
-        setErrorMessage('Start time is required.');
-        return;
-      }
+      setErrorMessage('Start time is required.');
+      return;
+    }
 
-    // 如果 start_time 中包含 'T'，将其替换为空格
     const formattedStartTime = tourData.start_time.replace('T', ' ');
 
     if (hasDuplicateHabitats()) {
@@ -71,23 +94,56 @@ const AddTour = () => {
     }
 
     try {
+      const processedRouteData = routeData.map(route => {
+        const selectedHabitat = availableHabitats.find(habitat => habitat.name === route.habitat);
+        return {
+          habitat: selectedHabitat ? selectedHabitat.id : route.habitat,
+          order: route.order
+        };
+      });
+
       const tourPayload = {
         ...tourData,
-        start_time: formattedStartTime,  // 使用格式化后的时间
-        route: routeData,
+        start_time: formattedStartTime,
+        route: processedRouteData,
       };
 
       const response = await createTourWithRoute(tourPayload);
       console.log('Tour Created:', response);
+      
+      setTourData({
+        name: '',
+        description: '',
+        duration: '00:00:00',
+        available_spots: 20,
+        start_time: '',
+      });
+      setRouteData([{
+        habitat: '',
+        order: 1
+      }]);
+      
+      if (onTourAdded) {
+        onTourAdded();
+      }
     } catch (error) {
       console.error('Error creating tour:', error);
-      setErrorMessage('There was an error creating the tour.');
+      setErrorMessage('There was an error creating the tour: ' + (error.error || error.message || ''));
     }
   };
+
+  if (isLoading) {
+    return <div>Loading habitats...</div>;
+  }
 
   return (
     <div style={{ padding: '20px', maxWidth: '600px', margin: '0 auto', fontFamily: 'Arial, sans-serif' }}>
       <h2 style={{ textAlign: 'center' }}>Add a New Tour</h2>
+      {errorMessage && (
+        <div style={{ color: 'red', padding: '10px', marginBottom: '15px', border: '1px solid red', borderRadius: '4px', backgroundColor: '#ffebee' }}>
+          {errorMessage}
+        </div>
+      )}
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
         <div>
           <label htmlFor="name" style={{ display: 'block', fontWeight: 'bold' }}>Tour Name:</label>
@@ -155,18 +211,28 @@ const AddTour = () => {
           <div key={index} style={{ border: '1px solid #ddd', padding: '10px', borderRadius: '8px' }}>
             <div>
               <label htmlFor={`habitat-${index}`} style={{ display: 'block', fontWeight: 'bold' }}>Habitat {index + 1}:</label>
-              <input
-                type="text"
+              <select
                 id={`habitat-${index}`}
                 name="habitat"
                 value={route.habitat}
                 onChange={(e) => handleRouteChange(index, e)}
                 required
                 style={{ width: '100%', padding: '8px', fontSize: '14px', borderRadius: '4px', border: '1px solid #ddd' }}
-              />
+              >
+                <option value="">Select a habitat</option>
+                {availableHabitats.map(habitat => (
+                  <option 
+                    key={habitat.id} 
+                    value={habitat.name}
+                    disabled={routeData.some(r => r.habitat === habitat.name && r !== route)}
+                  >
+                    {habitat.name}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
-              <label htmlFor={`order-${index}`} style={{ display: 'block', fontWeight: 'bold' }}>Order:</label>
+              <label htmlFor={`order-${index}`} style={{ display: 'block', fontWeight: 'bold', marginTop: '10px' }}>Order:</label>
               <input
                 type="number"
                 id={`order-${index}`}
@@ -228,8 +294,6 @@ const AddTour = () => {
           </button>
         </div>
       </form>
-
-      {errorMessage && <p style={{ color: 'red', textAlign: 'center' }}>{errorMessage}</p>}
     </div>
   );
 };
