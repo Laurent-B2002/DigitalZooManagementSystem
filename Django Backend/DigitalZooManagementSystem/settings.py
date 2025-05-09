@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-=w(*c84ivw8*3p5mxg&3nw)llxn@ao+a=#*b*z(o#v-*j$++z!
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -84,10 +84,10 @@ WSGI_APPLICATION = 'DigitalZooManagementSystem.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'zoodb2',
-        'USER': 'postgres',
-        'PASSWORD': '123456',
-        'HOST': 'localhost',
+        'NAME': 'zoodb',
+        'USER': 'xie',
+        'PASSWORD': '111',
+        'HOST': 'db',
         'PORT': '5432',
     }
 }
