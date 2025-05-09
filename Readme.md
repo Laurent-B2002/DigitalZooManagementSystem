@@ -36,7 +36,7 @@ Clone this repository to your local machine:
 
 ```bash
 git clone https://github.com/Laurent-B2002/DigitalZooManagementSystem.git
-cd DigitalZooManager
+cd DigitalZooManagementSystem
 ```
 
 ### Step 2: Build and Start the Containers
