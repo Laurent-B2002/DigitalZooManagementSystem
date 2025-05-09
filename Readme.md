@@ -85,7 +85,7 @@ Your PostgreSQL data will persist between runs.
 ## Project Structure
 
 ```
-DigitalZooManager/
+DigitalZooManagementSystem/
 ├── frontend/                # React frontend
 ├── Django Backend/          # Django backend
 ├── docker-compose.yml       # Docker configuration
