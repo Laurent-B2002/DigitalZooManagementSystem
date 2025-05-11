@@ -89,6 +89,8 @@ DigitalZooManagementSystem/
 ├── frontend/                # React frontend
 ├── Django Backend/          # Django backend
 ├── docker-compose.yml       # Docker configuration
+├── uml_diagrams/            # UML Diagrams of this project
+├── slides/                  # Weekly presentations on the project
 └── README.md                # This file
 ```
 
